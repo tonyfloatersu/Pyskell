@@ -4,5 +4,7 @@
 >
 > Just some entertainment project.
 >
-> To all of my friends.
+> To Jessica, Sarah, ZYF(~~YJSNPI~~) and all of my friends.
 
+![](https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/python/img/python.png)
+![](https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/haskell/img/haskell.png)

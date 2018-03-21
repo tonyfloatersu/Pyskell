@@ -20,7 +20,7 @@ class Lambda(object):
         self.args = args
         self.exec_body = exec_body
 
-    def __repr__(self):
+    def __str__(self):
         """representation"""
         return "(\{} -> {})".format(self.args, self.exec_body)
 
@@ -33,7 +33,7 @@ class Let(object):
         self.rep = rep
         self.env_expr = env_expr
 
-    def __repr__(self):
+    def __str__(self):
         """representation"""
         return "(let {} = {} in {})".format(self.expr,
                                             self.rep,
@@ -46,7 +46,7 @@ class FunctionApplication(object):
         self.func = func
         self.args = args
 
-    def __repr__(self):
+    def __str__(self):
         """representation"""
         return "({} {})".format(self.func, self.args)
 
@@ -56,7 +56,7 @@ class Variable(object):
     def __init__(self, name):
         self.name = name
 
-    def __repr__(self):
+    def __str__(self):
         """representation"""
         return str(self.name)
 
@@ -92,11 +92,12 @@ class TypeVariable(object):
     All type variables have a unique id, but names are only assigned lazily,
     when required.
     """
-    next_var_id = 0
-    next_var_name = 'a'
+    __next_var_id__ = 0
+    __next_var_name__ = 'a'
 
     def __init__(self):
-        pass
+        self.id = self.__next_var_id__
+        self.__next_var_id__ += 1
 
 
 class TypeOperator(object):
