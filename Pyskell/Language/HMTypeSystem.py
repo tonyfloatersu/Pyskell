@@ -92,12 +92,33 @@ class TypeVariable(object):
     All type variables have a unique id, but names are only assigned lazily,
     when required.
     """
-    __next_var_id__ = 0
-    __next_var_name__ = 'a'
+    __next_var_id = 0
+    __next_var_name = 0
 
-    def __init__(self):
-        self.id = self.__next_var_id__
-        self.__next_var_id__ += 1
+    def __init__(self, constraints=()):
+        self.id = self.__next_var_id
+        TypeVariable.__next_var_id += 1
+        self.constraints = constraints
+        self.__name = None
+        self.instance = None
+
+    def __generate_name(self):
+        if self.__name is None:
+            self.__name = "var_" + str(self.__next_var_name)
+            TypeVariable.__next_var_name += 1
+        return self.__name
+
+    @property
+    def name(self):
+        return self.__generate_name()
+
+    def __str__(self):
+        if self.instance is not None:
+            return str(self.instance)
+        return self.name
+
+    def __repr__(self):
+        return "TypeVariable(id = {0})".format(self.id)
 
 
 class TypeOperator(object):
