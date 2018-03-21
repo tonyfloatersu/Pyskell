@@ -6,5 +6,5 @@
 >
 > To Jessica, Sarah, Daniel, ZYF(~~YJSNPI~~), CTA, SCY and all of my friends.
 
-<img src="https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/python/img/python.png" alt="Drawing" style="width: 200px;"/>
-<img src="https://cdn.codementor.io/assets/topic/category_header/haskell-019c0d6e102e573012c2ab2cdd153b74.png" alt="Drawing" style="width: 200px;"/>
+<img src="https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/python/img/python.png" width="125"/> :electric_plug:  <img src="https://cdn.codementor.io/assets/topic/category_header/haskell-019c0d6e102e573012c2ab2cdd153b74.png" width="115"/>
+
