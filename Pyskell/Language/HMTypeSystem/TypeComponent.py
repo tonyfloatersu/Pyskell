@@ -104,7 +104,7 @@ class TypeVariable(object):
 
     def __generate_name(self):
         if self.__name is None:
-            self.__name = "var_" + str(self.__next_var_name)
+            self.__name = "type_" + str(self.__next_var_name)
             TypeVariable.__next_var_name += 1
         return self.__name
 
