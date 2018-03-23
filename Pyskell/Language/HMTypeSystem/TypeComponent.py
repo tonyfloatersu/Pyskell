@@ -171,3 +171,16 @@ class ListType(TypeOperator):
     def __repr__(self):
         """represent with [type]"""
         return "[{}]".format(show_type(self.types[0]))
+
+
+class InferenceError(Exception):
+    """If something goes wrong in HM TYPE SYS, raise this"""
+    def __init__(self, message):
+        self.__message = message
+
+    @property
+    def message(self):
+        return self.__message
+
+    def __str__(self):
+        return str(self.message)

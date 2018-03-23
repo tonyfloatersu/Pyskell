@@ -41,9 +41,24 @@ def occur_in(tp, types):
     return any(map(lambda x: occur_in_type(x, tp), types))
 
 
-def unify_to_type(tp_var, tp):
-    pass
+def is_generic(tp, not_generic):
+    return not occur_in(tp, not_generic)
 
 
 def unify_types(type1, type2):
+    def unify_with_type_variable(type_var, type_unknown):
+        if type_var != type_unknown:
+            if occur_in_type(type_var, type_unknown):
+                raise InferenceError("Unify_types: recursive unify error")
+            type_var.instance = type_unknown
+    p_t1 = prune(type1)
+    p_t2 = prune(type2)
+    if isinstance(p_t1, TypeVariable):
+        unify_with_type_variable(p_t1, p_t2)
+    elif isinstance(p_t1, TypeOperator) and isinstance(p_t2, TypeVariable):
+        unify_with_type_variable(p_t2, p_t1)
+    elif isinstance(p_t1, TypeOperator) and isinstance(p_t2, TypeOperator):
+        pass
+    else:
+        raise InferenceError("Unify_types: something cannot be unified")
     pass
