@@ -50,6 +50,9 @@ def unify_types(type1, type2):
         if type_var != type_unknown:
             if occur_in_type(type_var, type_unknown):
                 raise InferenceError("Unify_types: recursive unify error")
+            union = tuple(set(type_var.constraints + type_unknown.constraints))
+            type_var.constraints = union
+            type_unknown.constraints = union
             type_var.instance = type_unknown
     p_t1 = prune(type1)
     p_t2 = prune(type2)
@@ -61,4 +64,3 @@ def unify_types(type1, type2):
         pass
     else:
         raise InferenceError("Unify_types: something cannot be unified")
-    pass
