@@ -1,71 +1,3 @@
-"""
-Acknowledge:
-    Inspired by the following link:
-    http://smallshire.org.uk/sufficientlysmall/2010/04/11/a-hindley-milner-type-inference-implementation-in-python/
-BASIC KNOWLEDGE REQUIREMENT:
-    https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system
-"""
-
-
-"""
-ABT REQUIRED ELEMENTS
-(Abstract Binding Tree)
-"""
-
-
-class Lambda(object):
-    """Lambda re-defined"""
-    def __init__(self, args, exec_body):
-        """initialize with args and exec_body"""
-        self.args = args
-        self.exec_body = exec_body
-
-    def __str__(self):
-        """representation"""
-        return "(\{} -> {})".format(self.args, self.exec_body)
-
-
-class Let(object):
-    """Let expression be replace in environment expression"""
-    def __init__(self, expr, rep, env_expr):
-        """initialize with expression, replacement and env expression"""
-        self.expr = expr
-        self.rep = rep
-        self.env_expr = env_expr
-
-    def __str__(self):
-        """representation"""
-        return "(let {} = {} in {})".format(self.expr,
-                                            self.rep,
-                                            self.env_expr)
-
-
-class FunctionApplication(object):
-    """apply function to variable"""
-    def __init__(self, func, args):
-        self.func = func
-        self.args = args
-
-    def __str__(self):
-        """representation"""
-        return "({} {})".format(self.func, self.args)
-
-
-class Variable(object):
-    """variable re-define"""
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        """representation"""
-        return str(self.name)
-
-
-"""
-TYPE MANIPULATE
-"""
-
-
 def show_type(type_name):
     """
     Func: Show Type:
@@ -79,18 +11,13 @@ def show_type(type_name):
     return str(type_name)
 
 
-"""
-THE FOLLOWING FUNCTION IS NOT THREAD SAFE
-PLEASE USE ONLY UNDER SINGLE THREAD SITUATION
-"""
-
-
 class TypeVariable(object):
     """
     A type variable standing for an arbitrary type.
+    NOT THREAD SAFE, ONLY UNDER SINGLE THREAD SITUATION
 
-    All type variables have a unique id, but names are only assigned lazily,
-    when required.
+    All type variables have a unique id,
+    but names are only assigned lazily, when required.
     """
     __next_var_id = 0
     __next_var_name = 0
@@ -104,7 +31,7 @@ class TypeVariable(object):
 
     def __generate_name(self):
         if self.__name is None:
-            self.__name = "type_" + str(self.__next_var_name)
+            self.__name = "a" + str(self.__next_var_name)
             TypeVariable.__next_var_name += 1
         return self.__name
 
@@ -136,7 +63,7 @@ class TypeOperator(object):
                                 ' '.join(map(show_type, self.types)))
 
 
-class Function(TypeOperator):
+class Arrow(TypeOperator):
     """Bin-ary type constructor to build function types"""
     def __init__(self, from_type, to_type):
         super(self.__class__, self).__init__("->", [from_type, to_type])
