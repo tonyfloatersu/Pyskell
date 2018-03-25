@@ -4,7 +4,7 @@ class Variable(object):
         self.name = name
 
     def __str__(self):
-        return "variable {}".format(str(self.name))
+        return "{}".format(str(self.name))
 
 
 class FunctionApplication(object):

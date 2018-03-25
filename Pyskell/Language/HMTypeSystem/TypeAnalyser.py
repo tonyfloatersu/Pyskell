@@ -142,38 +142,3 @@ def analyze(node, env, non_generic=None):
         return analyze(node.expr, new_env, new_non_generic)
     else:
         assert False, "Unrecognized syntax string: {}".format(str(node))
-
-
-var1 = TypeVariable()
-var2 = TypeVariable()
-var3 = TypeVariable()
-var4 = TypeVariable()
-Pair = TypeOperator("*", (var1, var2))
-Bool = TypeOperator("bool", [])
-Integer = TypeOperator("int", [])
-NoneT = TypeOperator("None", [])
-
-# toy environment
-env = {"pair": Arrow(var1,
-                        Arrow(var2, Pair)),
-       "True": Bool,
-       "None": NoneT,
-       "id": Arrow(var4, var4),
-       "cond": Arrow(Bool, Arrow(var3, Arrow(var3, var3))),
-       "zero": Arrow(Integer, Bool),
-       "pred": Arrow(Integer, Integer),
-       "times": Arrow(Integer, Arrow(Integer, Integer)),
-       "4": Integer,
-       "1": Integer}
-
-# some expressions to play around with
-compose = Lambda("f",
-              Lambda("g",
-                  Lambda("arg",
-                      FunctionApplication(Variable("g"), FunctionApplication(Variable("f"), Variable("arg"))))))
-pair = FunctionApplication(FunctionApplication(Variable("pair"), FunctionApplication(Variable("f"), Variable("1"))),
-           FunctionApplication(Variable("f"), Variable("True")))
-
-a = analyze(compose, env)
-
-print a
