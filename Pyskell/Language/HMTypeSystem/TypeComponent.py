@@ -11,6 +11,21 @@ def show_type(type_name):
     return str(type_name)
 
 
+"""
+newtype TVar = TV String
+  deriving (Show, Eq, Ord)
+
+data Type = TVar TVar
+          | TCon String
+          | TArr Type Type
+          deriving (Show, Eq, Ord)
+
+data Scheme = Forall [TVar] Type
+            deriving (Show, Eq, Ord)
+
+"""
+
+
 class TypeVariable(object):
     """
     A type variable standing for an arbitrary type.

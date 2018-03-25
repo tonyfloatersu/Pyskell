@@ -1,4 +1,5 @@
 from TypeComponent import *
+from SyntaxComponent import *
 
 
 def prune(tp):
@@ -45,35 +46,40 @@ def is_generic(tp, not_generic):
     return not occur_in(tp, not_generic)
 
 
-def unify_types(type1, type2):
-    def unify_with_type_variable(type_var, type_unknown):
-        if type_var != type_unknown:
-            if occur_in_type(type_var, type_unknown):
-                raise InferenceError("Unify_types: recursive unify error")
-            union = tuple(set(type_var.constraints + type_unknown.constraints))
-            type_var.constraints = union
-            type_unknown.constraints = union
-            type_var.instance = type_unknown
-    p_t1 = prune(type1)
-    p_t2 = prune(type2)
-    if isinstance(p_t1, TypeVariable):
-        unify_with_type_variable(p_t1, p_t2)
-    elif isinstance(p_t1, TypeOperator) and isinstance(p_t2, TypeVariable):
-        unify_with_type_variable(p_t2, p_t1)
-    elif isinstance(p_t1, TypeOperator) and isinstance(p_t2, TypeOperator):
-        if isinstance(p_t1.name, TypeVariable) and len(p_t1.types) > 0:
-            p_t1.name = p_t2.name
-            p_t1.types = p_t2.types
-            unify_types(p_t1, p_t2)
-        elif isinstance(p_t2.name, TypeVariable):
-            unify_types(p_t2, p_t1)
-        elif p_t1.name != p_t2.name or len(p_t1.types) != len(p_t2.types):
-            raise TypeError("Type mismatch: {0} != {1}".format(str(p_t1),
-                                                               str(p_t2)))
-        for p, q in zip(p_t1.types, p_t2.types):
-            unify_types(p, q)
+def unify_type(tp_1, tp_2):
+    def bind(t_1, t_2):
+        if t_1 != t_2:
+            if isinstance(t_2, TypeVariable):
+                union = tuple(set(t_1.constraints + t_2.constraints))
+                t_1.constraints = union
+                t_2.constraints = union
+            if occur_in_type(t_1, t_2):
+                raise InferenceError("Recursive Type Infinite")
+            t_1.instance = t_2
+
+    def unify_type_operator(to_1, to_2):
+        # poly
+        if isinstance(to_1.name, TypeVariable) and len(to_1.types) > 0:
+            to_1.name = to_2.name
+            to_1.types = to_2.types
+            unify_type(to_1, to_2)
+        elif isinstance(to_2.name, TypeVariable):
+            unify_type(to_2, to_1)
+        # mono
+        elif to_1.name != to_2.name or len(to_1.types) != len(to_2.types):
+            raise InferenceError("Unify Mismatch: {} != {}".format(to_1, to_2))
+        for i, j in zip(to_1.types, to_2.types):
+            unify_type(i, j)
+
+    type_1, type_2 = prune(tp_1), prune(tp_2)
+    if isinstance(type_1, TypeOperator) and isinstance(type_2, TypeOperator):
+        unify_type_operator(type_1, type_2)
+    elif isinstance(type_1, TypeVariable):
+        bind(type_1, type_2)
+    elif isinstance(type_2, TypeVariable):
+        bind(type_2, type_1)
     else:
-        raise InferenceError("Unify_types: something cannot be unified")
+        assert False, "Unify Type fail: {0}, {1}".format(type_1, type_2)
 
 
 def fresh(t, non_generic):
@@ -112,27 +118,27 @@ def analyze(node, env, non_generic=None):
     if isinstance(node, Variable):
         return get_type(node.name, env, non_generic)
     elif isinstance(node, FunctionApplication):
-        fun_type = analyze(node.func, env, non_generic)
-        arg_type = analyze(node.args, env, non_generic)
+        fun_type = analyze(node.expr_func, env, non_generic)
+        arg_type = analyze(node.expr_arg, env, non_generic)
         res_type = TypeVariable()
-        unify_types(Function(arg_type, fun_type), res_type)
+        unify_type(Arrow(arg_type, res_type), fun_type)
         return res_type
     elif isinstance(node, Lambda):
         arg_type = TypeVariable()
         new_env = env.copy()
-        new_env[node.args] = arg_type
+        new_env[node.name] = arg_type
         new_non_generic = non_generic.copy()
-        new_non_generic.add(node.args)
-        res_type = analyze(node.exec_body, new_env, new_non_generic)
-        return Function(arg_type, res_type)
+        new_non_generic.add(node.name)
+        res_type = analyze(node.expr_body, new_env, new_non_generic)
+        return Arrow(arg_type, res_type)
     elif isinstance(node, Let):
         new_type = TypeVariable()
         new_env = env.copy()
-        new_env[node.expr] = new_type
+        new_env[node.name_replaced] = new_type
         new_non_generic = non_generic.copy()
         new_non_generic.add(new_type)
-        rep_type = analyze(node.rep, new_env, new_non_generic)
-        unify_types(rep_type, new_type)
-        return analyze(node.env_expr, new_env, new_non_generic)
+        rep_type = analyze(node.expr_replacement, new_env, new_non_generic)
+        unify_type(rep_type, new_type)
+        return analyze(node.expr, new_env, new_non_generic)
     else:
         assert False, "Unrecognized syntax string: {}".format(str(node))
