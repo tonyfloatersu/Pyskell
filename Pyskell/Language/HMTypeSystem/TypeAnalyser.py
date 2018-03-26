@@ -117,7 +117,7 @@ def analyze(node, env, non_generic=None):
         non_generic = set()
     if isinstance(node, Variable):
         return get_type(node.name, env, non_generic)
-    elif isinstance(node, FunctionApplication):
+    elif isinstance(node, FuncApp):
         fun_type = analyze(node.expr_func, env, non_generic)
         arg_type = analyze(node.expr_arg, env, non_generic)
         res_type = TypeVariable()

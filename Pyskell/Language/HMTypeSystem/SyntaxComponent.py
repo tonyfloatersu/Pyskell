@@ -7,7 +7,7 @@ class Variable(object):
         return "{}".format(str(self.name))
 
 
-class FunctionApplication(object):
+class FuncApp(object):
     """apply function to variable"""
     def __init__(self, expr_func, expr_arg):
         self.expr_func = expr_func
