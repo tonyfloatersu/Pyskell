@@ -138,7 +138,7 @@ def analyze(node, env, non_generic=None):
         new_non_generic = non_generic.copy()
         new_non_generic.add(new_type)
         rep_type = analyze(node.expr_replacement, new_env, new_non_generic)
-        unify_type(rep_type, new_type)
+        unify_type(new_type, rep_type)
         return analyze(node.expr, new_env, new_non_generic)
     else:
         assert False, "Unrecognized syntax string: {}".format(str(node))

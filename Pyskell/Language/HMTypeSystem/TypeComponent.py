@@ -11,21 +11,6 @@ def show_type(type_name):
     return str(type_name)
 
 
-"""
-newtype TVar = TV String
-  deriving (Show, Eq, Ord)
-
-data Type = TVar TVar
-          | TCon String
-          | TArr Type Type
-          deriving (Show, Eq, Ord)
-
-data Scheme = Forall [TVar] Type
-            deriving (Show, Eq, Ord)
-
-"""
-
-
 class TypeVariable(object):
     """
     A type variable standing for an arbitrary type.
@@ -65,6 +50,7 @@ class TypeVariable(object):
 
 class TypeOperator(object):
     """n-ary type constructor which builds a new type"""
+
     def __init__(self, name, types):
         """initialize with name and n types to construct"""
         self.name = name
@@ -74,23 +60,25 @@ class TypeOperator(object):
         """representation with self type and constituent type"""
         if len(self.types) == 0:
             return show_type(self.name)
-        return "({} {})".format(show_type(self.name),
-                                ' '.join(map(show_type, self.types)))
+        return "({} {})".format(
+            show_type(self.name), ' '.join(map(show_type, self.types)))
 
 
 class Arrow(TypeOperator):
     """Bin-ary type constructor to build function types"""
+
     def __init__(self, from_type, to_type):
         super(self.__class__, self).__init__("->", [from_type, to_type])
 
     def __repr__(self):
         """represent with (a -> b) type"""
-        return "({1} {0} {2})".format(show_type(self.name),
-                                      *map(show_type, self.types))
+        return "({1} {0} {2})".format(
+            show_type(self.name), *map(show_type, self.types))
 
 
 class TupleType(TypeOperator):
     """N-ary constructor which builds tuple types"""
+
     def __init__(self, types):
         """call TypeOperator typename tuple and type list"""
         super(self.__class__, self).__init__(tuple, types)
@@ -102,6 +90,7 @@ class TupleType(TypeOperator):
 
 class ListType(TypeOperator):
     """Unary constructor which builds list types"""
+
     def __init__(self, list_type):
         """
         call TypeOperator typename []
@@ -117,6 +106,7 @@ class ListType(TypeOperator):
 
 class InferenceError(Exception):
     """If something goes wrong in HM TYPE SYS, raise this"""
+
     def __init__(self, message):
         self.__message = message
 
