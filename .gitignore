@@ -1,5 +1,6 @@
 .idea/*
-.pyc
-.o
+*.pyc
+*.o
 .lib
 .cache/*
+*/.cache/*
