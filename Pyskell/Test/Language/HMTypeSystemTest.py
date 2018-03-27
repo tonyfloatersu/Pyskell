@@ -245,7 +245,3 @@ class HMTypeSystemTest(unittest.TestCase):
                 ),
             self.Integer
         )
-
-
-if __name__ == '__main__':
-    unittest.main()
