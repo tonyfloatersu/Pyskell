@@ -54,7 +54,6 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
         return type_var_dict[argument]
     elif argument is None:
         return TypeOperator(None, [])
-    # TODO: Higher kind / Sub Sig
     elif isinstance(argument, TypeSignature):
         """
         Due to the Syntax of Python, Tuple is used
