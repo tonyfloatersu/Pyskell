@@ -60,10 +60,29 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
         Due to the Syntax of Python, Tuple is used
         So I have to let function sig be another type signature
         """
-        # return make_func_type(_)
-        pass
+        return make_func_type(type_sig_build(argument, type_var_dict))
     elif isinstance(argument, TypeSignatureHigherKind):
-        pass
+        global higher_kind
+        if type(argument.constructor) is str:
+            higher_kind = type_sig_arg_build(argument.constructor,
+                                             constraints,
+                                             type_var_dict)
+        else:
+            higher_kind = argument.constructor
+        return TypeOperator(higher_kind,
+                            list(map(lambda x:
+                                     type_sig_arg_build(x,
+                                                        constraints,
+                                                        type_var_dict),
+                                     argument.parameters)))
     raise TypeSignatureError(
         "Type Signature Fail to Build Argument: {}".format(argument)
     )
+
+
+def type_sig_build(type_sig, type_var_dict=None):
+    args, constraints = type_sig.args, type_sig.constraints
+    type_var_dict = {} if type_var_dict is None else type_var_dict
+    return list(map(lambda x:
+                    type_sig_arg_build(x, constraints, type_var_dict),
+                    args))
