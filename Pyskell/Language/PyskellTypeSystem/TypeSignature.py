@@ -1,8 +1,30 @@
 """
 Types, identify yourself!
 Even if you are a function/mono-type/monad!
+
 """
 from Pyskell.Language.HMTypeSystem import *
+import types
+
+__python_builtins__ = {
+    types.BooleanType, types.BufferType, types.BuiltinFunctionType,
+    types.BuiltinMethodType, types.ClassType, types.CodeType,
+    types.ComplexType, types.DictProxyType, types.DictType,
+    types.DictionaryType, types.EllipsisType, types.FileType,
+    types.FloatType, types.FrameType, types.FunctionType,
+    types.GeneratorType, types.GetSetDescriptorType, types.InstanceType,
+    types.IntType, types.LambdaType, types.ListType, types.LongType,
+    types.MemberDescriptorType, types.MethodType, types.ModuleType,
+    types.NoneType, types.NotImplementedType, types.ObjectType,
+    types.SliceType, types.StringType, types.StringTypes,
+    types.TracebackType, types.TupleType, types.TypeType,
+    types.UnboundMethodType, types.UnicodeType, types.XRangeType, set,
+    frozenset}
+
+__python_function_types__ = {
+    types.FunctionType, types.LambdaType, types.MethodType,
+    types.UnboundMethodType, types.BuiltinFunctionType,
+    types.BuiltinMethodType}
 
 
 class TypeSignatureError(Exception):
@@ -85,3 +107,33 @@ def type_sig_build(type_sig, type_var_dict=None):
     return list(map(lambda x:
                     type_sig_arg_build(x, constraints, type_var_dict),
                     args))
+
+
+class PythonFunctionType(object):
+    pass
+
+
+class OriginType(object):
+    """
+    Everything starts at this type in Pyskell
+    """
+    def __type__(self):
+        raise TypeError("You touch something you should never touch")
+
+
+class Undefined(OriginType):
+    def __type__(self):
+        return TypeVariable()
+
+
+def type_of(unknown_type):
+    TypeVariable.next_var_name = 0
+    if isinstance(unknown_type, OriginType):
+        return unknown_type.__type__()
+    elif isinstance(unknown_type, tuple):
+        return TupleType(list(map(type_of, unknown_type)))
+    elif unknown_type is None:
+        return TypeOperator(None, [])
+    elif type(unknown_type) in __python_function_types__:
+        return TypeOperator(PythonFunctionType, [])
+    return TypeOperator(type(unknown_type), [])

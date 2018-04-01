@@ -20,7 +20,7 @@ class TypeVariable(object):
     but names are only assigned lazily, when required.
     """
     __next_var_id = 0
-    __next_var_name = 0
+    next_var_name = 0
 
     def __init__(self, constraints=()):
         self.id = self.__next_var_id
@@ -31,8 +31,8 @@ class TypeVariable(object):
 
     def __generate_name(self):
         if self.__name is None:
-            self.__name = "a" + str(self.__next_var_name)
-            TypeVariable.__next_var_name += 1
+            self.__name = "a" + str(self.next_var_name)
+            TypeVariable.next_var_name += 1
         return self.__name
 
     @property
