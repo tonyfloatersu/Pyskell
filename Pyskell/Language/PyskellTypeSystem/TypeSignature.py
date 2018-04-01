@@ -21,6 +21,16 @@ class TypeSignatureHigherKind(object):
         self.parameters = t_parameters
 
 
+def make_func_type(type_para_list):
+    if len(type_para_list) < 2:
+        raise TypeSignatureError("Something's wrong in make func part.")
+    elif len(type_para_list) == 2:
+        return Arrow(type_para_list[0], type_para_list[1])
+    else:
+        return Arrow(type_para_list[0],
+                     make_func_type(type_para_list[1:]))
+
+
 def type_sig_arg_build(argument, constraints, type_var_dict):
     if isinstance(argument, list) and len(argument) == 1:
         return ListType(type_sig_arg_build(argument[0],
@@ -45,6 +55,15 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     elif argument is None:
         return TypeOperator(None, [])
     # TODO: Higher kind / Sub Sig
+    elif isinstance(argument, TypeSignature):
+        """
+        Due to the Syntax of Python, Tuple is used
+        So I have to let function sig be another type signature
+        """
+        # return make_func_type(_)
+        pass
+    elif isinstance(argument, TypeSignatureHigherKind):
+        pass
     raise TypeSignatureError(
         "Type Signature Fail to Build Argument: {}".format(argument)
     )
