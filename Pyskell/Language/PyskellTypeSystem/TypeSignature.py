@@ -1,7 +1,7 @@
 """
 Types, identify yourself!
 Even if you are a function/mono-type/monad!
-
+It's somewhat about static type and Py-skell layer of type
 """
 from Pyskell.Language.HMTypeSystem import *
 import types
@@ -21,10 +21,19 @@ __python_builtins__ = {
     types.UnboundMethodType, types.UnicodeType, types.XRangeType, set,
     frozenset}
 
+
+def is_builtin_type(some_type):
+    return some_type in __python_builtins__
+
+
 __python_function_types__ = {
     types.FunctionType, types.LambdaType, types.MethodType,
     types.UnboundMethodType, types.BuiltinFunctionType,
     types.BuiltinMethodType}
+
+
+def is_py_func_type(some_type):
+    return some_type in __python_function_types__
 
 
 class TypeSignatureError(Exception):
@@ -118,7 +127,8 @@ class OriginType(object):
     Everything starts at this type in Pyskell
     """
     def __type__(self):
-        raise TypeError("You touch something you should never touch")
+        raise TypeError("You touch something you should never touch\n"
+                        "THIS IS ORIGIN TYPE, EVERYTHING STARTS HERE")
 
 
 class Undefined(OriginType):
