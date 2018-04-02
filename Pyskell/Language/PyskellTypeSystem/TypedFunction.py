@@ -36,7 +36,22 @@ class TypedFunction(OriginType):
 
     def __sub__(self, other):
         """(b -> c) -> (a -> b) -> (a -> c)"""
-        pass
+        if not isinstance(other, TypedFunction):
+            return other.__rmul__(self)
+
+        else:
+            eval_env = {id(self): self.fn_type, id(other): other.fn_type}
+            compose_type = Lambda("arg",
+                                  FuncApp(Variable(id(self)),
+                                          FuncApp(Variable(id(other)),
+                                                  Variable("arg")
+                                                  )
+                                          )
+                                  )
+            new_fn_type = analyze(compose_type, eval_env)
+            new_fn_arg = [other.fn_args[0]] + self.fn_args[1:]
+            return TypedFunction(lambda x: self.fn(other.fn(x)),
+                                 new_fn_arg, new_fn_type)
 
     def __mod__(self, other):
         """(a -> b) -> a -> b"""
