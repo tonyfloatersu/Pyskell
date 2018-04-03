@@ -3,6 +3,7 @@ it's a function's world...
 but it would be nothing
 without types
 We are going to use some hack methods for
+identify the function identify in environment
 """
 from TypeSignature import *
 from functools import partial
@@ -34,7 +35,7 @@ class TypedFunction(OriginType):
         return TypedFunction(partial(self.fn, *args),
                              self.fn_args[len(args):], result_type)
 
-    def __sub__(self, other):
+    def __mul__(self, other):
         """(b -> c) -> (a -> b) -> (a -> c)"""
         if not isinstance(other, TypedFunction):
             return other.__rmul__(self)
