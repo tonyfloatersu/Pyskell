@@ -4,6 +4,7 @@ We can carefully, and easily create a lot of types
 """
 
 from TypeSignature import *
+from TypedFunction import *
 from collections import namedtuple
 
 
@@ -121,9 +122,41 @@ def generate_data_constructor(data_con_name, fields,
 
 
 def build_adt(typename, type_args, data_constructors, to_derive):
+    """
+    Create a new ADT
+
+    Arguments:
+        typename {str}:
+        A string for the name of type con
+
+        type_args {[str]}:
+        A list of strings for the type parameters.
+        requirements:
+        - all the strings should be lowercase
+        - strings should be unique
+
+        data_constructors {[(name, [field])]}:
+        refer to the data constructor gen func.
+
+        to_derive {[TypeClass]}:
+        a list of type classes
+
+    Returns:
+        The type constructor with data cons
+    """
+
     adt_type = generate_type_constructor(typename, type_args)
     data_cons = [generate_data_constructor(dc_name, dc_field, adt_type, i)
                  for i, (dc_name, dc_field) in enumerate(data_constructors)]
 
     # TODO: SOMETHING NEED TO BE DONE LATER
+    for i, (dc_name, dc_fields) in enumerate(data_constructors):
+        if len(dc_fields) == 0:
+            continue
+        return_adt_type = TypeSignatureHigherKind(adt_type, type_args)
+        signature = TypeSignature([], list(dc_fields) + [return_adt_type])
+        arg_ify_sig = type_sig_build(signature, {})
+        data_cons[i] = TypedFunction(data_cons[i], arg_ify_sig,
+                                     make_func_type(arg_ify_sig))
+
     return tuple([adt_type] + data_cons)
