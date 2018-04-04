@@ -4,3 +4,4 @@
 .lib
 .cache/*
 */.cache/*
+.vscode/*

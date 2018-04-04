@@ -15,6 +15,27 @@ class ADT(OriginType):
 
 
 def generate_type_constructor(name, type_args):
+    """
+    Generates the type_generator for algebraic data type
+
+    Example:
+        data Maybe a = Just a
+                     | Nothing
+
+    Arguments:
+        name {str}:
+        Type's name(str), eg: `Maybe`
+
+        type_args {[a]}:
+        list of argument-types creating constructor
+
+    Returns:
+        A type with all magic undetermined.
+        Inherit from `ADT` type.
+        With `__type__` defined as TypeOperator of
+        self and type arguments as TypeVariables
+    """
+
     def raise_error(whatever):
         raise whatever()
     default_attributes = {"__parameters__": tuple(type_args),
@@ -45,6 +66,41 @@ def generate_type_constructor(name, type_args):
 def generate_data_constructor(data_con_name, fields,
                               master_type_constructor,
                               slot_order_in_adt):
+    """
+    Generates a data_constructor for ADT
+
+    Arguments:
+
+        data_con_name {str}:
+        data constructor name, eg: `Just`
+
+        fields {[types]}:
+        types after type constructor, eg: Just a
+
+        master_type_constructor {ADT type}:
+        master adt type for this data constructor
+
+        slot_order_in_adt {int}:
+        this data constructor's order in adt.
+        eg: In Maybe, Just = 0, Nothing = 1
+
+    Returns:
+        A data constructor, containing:
+        __type_constructor__ as type-constructor
+        __ADT__slot__order__ as order in ADT
+        inherit from:
+        - some master adt type constructor
+        - namedtuple for data constructor with
+          data constructor name
+        if the field is not empty, change:
+            __type__ from type constructor
+            by [type_of(self[fields.index(k)])
+                if k in fields else TypeVariable()
+                for k in master_type_constructor.\
+                    __parameters__]
+        Also, add a data con to type con
+    """
+
     base_class = namedtuple(data_con_name, ["i{}".format(i)
                                             for i, _ in enumerate(fields)])
     data_con_class = type(data_con_name, (master_type_constructor,
