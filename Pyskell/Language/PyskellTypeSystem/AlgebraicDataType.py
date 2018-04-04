@@ -104,7 +104,8 @@ def generate_data_constructor(data_con_name, fields,
 
     base_class = namedtuple(data_con_name, ["i{}".format(i)
                                             for i, _ in enumerate(fields)])
-    data_con_class = type(data_con_name, (master_type_constructor, base_class), {})
+    data_con_class = type(data_con_name, tuple([master_type_constructor,
+                                                base_class]), {})
     data_con_class.__type_constructor__ = master_type_constructor
     data_con_class.__ADT__slot__order__ = slot_order_in_adt
     if len(fields) == 0:
