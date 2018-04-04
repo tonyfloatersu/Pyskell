@@ -4,7 +4,7 @@ We can carefully, and easily create a lot of types
 """
 
 from TypeSignature import *
-from TypedFunction import *
+from TypedFunction import TypedFunction
 from collections import namedtuple
 
 
@@ -83,7 +83,7 @@ def generate_data_constructor(data_con_name, fields,
 
         slot_order_in_adt {int}:
         this data constructor's order in adt.
-        eg: In Maybe, Just = 0, Nothing = 1
+        In Maybe, Just = 0, Nothing = 1
 
     Returns:
         A data constructor, containing:
@@ -104,8 +104,7 @@ def generate_data_constructor(data_con_name, fields,
 
     base_class = namedtuple(data_con_name, ["i{}".format(i)
                                             for i, _ in enumerate(fields)])
-    data_con_class = type(data_con_name, (master_type_constructor,
-                                          base_class), {})
+    data_con_class = type(data_con_name, (master_type_constructor, base_class), {})
     data_con_class.__type_constructor__ = master_type_constructor
     data_con_class.__ADT__slot__order__ = slot_order_in_adt
     if len(fields) == 0:
@@ -131,7 +130,6 @@ def build_adt(typename, type_args, data_constructors, to_derive):
 
         type_args {[str]}:
         A list of strings for the type parameters.
-        requirements:
         - all the strings should be lowercase
         - strings should be unique
 
