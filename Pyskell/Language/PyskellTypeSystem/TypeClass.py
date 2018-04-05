@@ -28,7 +28,7 @@ class TypeClass(object):
     __metaclass__ = TypeClassMeta
 
     @classmethod
-    def make_instance(cls, _type, *args):
+    def make_instance(cls, _type, **args):
         raise NotImplementedError("Type Classes must be implemented with "
                                   "make-instance")
 
