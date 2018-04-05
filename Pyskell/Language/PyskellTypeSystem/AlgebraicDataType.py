@@ -148,7 +148,9 @@ def build_adt(typename, type_args, data_constructors, to_derive):
     data_cons = [generate_data_constructor(dc_name, dc_field, adt_type, i)
                  for i, (dc_name, dc_field) in enumerate(data_constructors)]
 
-    # TODO: SOMETHING NEED TO BE DONE LATER
+    for type_class in to_derive:
+        type_class.derive_instance(adt_type)
+
     for i, (dc_name, dc_fields) in enumerate(data_constructors):
         if len(dc_fields) == 0:
             continue
