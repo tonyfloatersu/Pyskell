@@ -1,4 +1,3 @@
-from HMTypeSystem import *
 from PyskellTypeSystem import *
 from inspect import isclass
 from collections import defaultdict
@@ -55,6 +54,23 @@ class Instance(Syntax):
         self.type_class.make_instance(self.cls, **kwargs)
 
 
+class TS(Syntax):
+    """Type Signature"""
+    def __init__(self, sig):
+        super(TS, self).__init__("Syntax Error in Type Signature")
+        if not isinstance(sig, Signature):
+            raise SyntaxError("Signature expected in TS() found {}"
+                              .format(sig))
+        elif len(sig.signature.args) < 2:
+            raise SyntaxError("Type Signature Argument Not Enough")
+        self.signature = sig.signature
+
+    def __call__(self, fn):
+        func_args = type_sig_build(self.signature)
+        func_type = make_func_type(func_args)
+        return TypedFunction(fn, func_args, func_type)
+
+
 class Signature(Syntax):
     def __init__(self, args, constraints):
         super(Signature, self).__init__("Syntax Error in Type Signature")
@@ -64,6 +80,9 @@ class Signature(Syntax):
         other = other.signature if isinstance(other, Signature) else other
         return Signature(self.signature.args + (other,),
                          self.signature.constraints)
+
+    def __rpow__(self, other):
+        return TS(self)(other)
 
 
 class Constraints(Syntax):
@@ -99,5 +118,14 @@ class Constraints(Syntax):
         return self.__div__(other)
 
 
-T_Con = Constraints()
+T_C = Constraints()
 py_func = PythonFunctionType
+
+
+class SyntaxUndefined(Undefined):
+    pass
+
+
+replace_magic_methods(SyntaxUndefined, lambda *x: Undefined())
+undefined = SyntaxUndefined()
+
