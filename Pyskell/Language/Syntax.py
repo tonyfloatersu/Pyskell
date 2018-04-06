@@ -1,6 +1,7 @@
 from HMTypeSystem import *
 from PyskellTypeSystem import *
 from inspect import isclass
+from collections import defaultdict
 
 
 def _t(obj):
@@ -54,18 +55,49 @@ class Instance(Syntax):
         self.type_class.make_instance(self.cls, **kwargs)
 
 
+class Signature(Syntax):
+    def __init__(self, args, constraints):
+        super(Signature, self).__init__("Syntax Error in Type Signature")
+        self.signature = TypeSignature(constraints, args)
+
+    def __rshift__(self, other):
+        other = other.signature if isinstance(other, Signature) else other
+        return Signature(self.signature.args + (other,),
+                         self.signature.constraints)
+
+
 class Constraints(Syntax):
     def __init__(self, constraints=()):
         super(Constraints, self).__init__("Syntax Error in Type Signature")
+        self.constraints = defaultdict(list)
+        if len(constraints) > 0:
+            if isinstance(constraints[0], tuple):
+                for con in constraints:
+                    self.__add_tc_constraints(con)
+            else:
+                self.__add_tc_constraints(constraints)
+        return
 
     def __add_tc_constraints(self, con):
-        pass
+        if len(con) != 2 or not isinstance(con, tuple):
+            raise SyntaxError("Invalid Type-class Constraint: {}"
+                              .format(str(con)))
+        if not isinstance(con[1], str):
+            raise SyntaxError("{} is not type variable".format(con[1]))
+        if not (isclass(con[0]) and issubclass(con[0], TypeClass)):
+            raise SyntaxError("{} is not a type-class".format(con[0]))
+        self.constraints[con[1]].append(con[0])
+        return
 
     def __getitem__(self, item):
         return Constraints(item)
 
     def __div__(self, other):
-        pass
+        return Signature((), self.constraints) >> other
 
     def __truediv__(self, other):
         return self.__div__(other)
+
+
+T_Con = Constraints()
+py_func = PythonFunctionType
