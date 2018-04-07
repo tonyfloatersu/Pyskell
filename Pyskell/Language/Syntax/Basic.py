@@ -1,4 +1,4 @@
-from PyskellTypeSystem import *
+from Pyskell.Language.PyskellTypeSystem import *
 from inspect import isclass
 from collections import defaultdict
 
@@ -129,3 +129,12 @@ class SyntaxUndefined(Undefined):
 replace_magic_methods(SyntaxUndefined, lambda *x: Undefined())
 undefined = SyntaxUndefined()
 
+
+def t(type_constructor, *parameters):
+    if issubclass(type_constructor, ADT) and isclass(type_constructor) and \
+       len(type_constructor.__parameters__) != len(parameters):
+        raise TypeError("Incorrect number of type parameter {}"
+                        .format(type_constructor.__name__))
+    parameters = [i.signature if isinstance(i, Signature) else i
+                  for i in parameters]
+    return TypeSignatureHigherKind(type_constructor, parameters)
