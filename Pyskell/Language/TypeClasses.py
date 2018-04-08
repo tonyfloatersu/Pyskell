@@ -6,6 +6,7 @@ from Syntax.Basic import TS
 from Syntax.Basic import C
 from Syntax.Basic import Instance
 from Syntax.Pattern import nt_to_tuple
+import operator
 
 
 class Show(TypeClass):
@@ -51,3 +52,114 @@ Instance(Show, list).where(show=list.__str__)
 Instance(Show, tuple).where(show=tuple.__str__)
 Instance(Show, set).where(show=set.__str__)
 Instance(Show, dict).where(show=dict.__str__)
+
+
+class Eq(TypeClass):
+    @classmethod
+    def make_instance(cls, _type, **args):
+        if "eq" not in args:
+            raise KeyError("No eq entry")
+
+        def default_ne(self, other):
+            return not args["eq"](self, other)
+
+        __eq__ = args["eq"] ** (C / "a" >> "a" >> bool)
+        __ne__ = (default_ne if "ne" not in args
+                  else args["ne"]) ** (C / "a" >> "a" >> bool)
+        add_instance(Eq, _type, {"eq": lambda x, y: __eq__(x, y),
+                                 "ne": lambda x, y: __ne__(x, y)})
+        if not is_builtin_type(_type):
+            _type.__eq__ = lambda x, y: __eq__(x, y)
+            _type.__ne__ = lambda x, y: __ne__(x, y)
+
+    @classmethod
+    def derive_instance(cls, _type):
+        if not hasattr(_type.__class__, "_fields"):
+            raise TypeError("Fail to derive Eq")
+
+        def __eq__(self, other):
+            return self.__class__ == other.__class__ \
+                   and nt_to_tuple(self) == nt_to_tuple(other)
+
+        def __ne__(self, other):
+            return self.__class__ != other.__class__ \
+                   or nt_to_tuple(self) == nt_to_tuple(other)
+
+        Eq.make_instance(_type, eq=__eq__, ne=__ne__)
+
+
+Instance(Eq, str).where(eq=str.__eq__, ne=str.__ne__)
+Instance(Eq, float).where(eq=float.__eq__, ne=float.__ne__)
+Instance(Eq, complex).where(eq=complex.__eq__, ne=complex.__ne__)
+Instance(Eq, list).where(eq=list.__eq__, ne=list.__ne__)
+Instance(Eq, tuple).where(eq=tuple.__eq__, ne=tuple.__ne__)
+Instance(Eq, set).where(eq=set.__eq__, ne=set.__ne__)
+Instance(Eq, dict).where(eq=dict.__eq__, ne=dict.__ne__)
+Instance(Eq, type).where(eq=type.__eq__, ne=type.__ne__)
+Instance(Eq, unicode).where(eq=unicode.__eq__, ne=unicode.__ne__)
+
+
+class Ord(Eq):
+    @classmethod
+    def make_instance(cls, _type, **args):
+        if "lt" not in args:
+            raise TypeError("No Ord Entry")
+        __lt__ = args["lt"] ** (C / "a" >> "a" >> bool)
+
+        def default_le(x, y):
+            return x.__lt__(y) or x.__eq__(y)
+
+        __le__ = (default_le if "le" not in args
+                  else args["le"]) ** (C / "a" >> "a" >> bool)
+
+        def default_gt(x, y):
+            return not x.__lt__(y) and not x.__eq__(y)
+
+        __gt__ = (default_gt if "gt" not in args
+                  else args["gt"]) ** (C / "a" >> "a" >> bool)
+
+        def default_ge(x, y):
+            return not x.__lt__(y) or x.__eq__(y)
+
+        __ge__ = (default_ge if "ge" not in args
+                  else args["ge"]) ** (C / "a" >> "a" >> bool)
+
+        add_instance(Ord, _type, {"lt": lambda x, y: __lt__(x, y),
+                                  "gt": lambda x, y: __gt__(x, y),
+                                  "le": lambda x, y: __le__(x, y),
+                                  "ge": lambda x, y: __ge__(x, y)})
+
+        if not is_builtin_type(_type):
+            _type.__lt__ = __lt__
+
+    @classmethod
+    def derive_instance(cls, _type):
+        def zip_adt_cmp(x, y, fn):
+            if x.__ADT_slot__ == y.__ADT_slot__:
+                if len(nt_to_tuple(x)) == 0:
+                    return fn((), ())
+                return fn(nt_to_tuple(x), nt_to_tuple(y))
+            return fn(x.__ADT_slot__, y.__ADT_slot__)
+        Ord.make_instance(_type,
+                          lt=lambda x, y: zip_adt_cmp(x, y, operator.lt),
+                          le=lambda x, y: zip_adt_cmp(x, y, operator.le),
+                          gt=lambda x, y: zip_adt_cmp(x, y, operator.gt),
+                          ge=lambda x, y: zip_adt_cmp(x, y, operator.ge))
+
+
+Instance(Ord, str).where(lt=str.__lt__, le=str.__le__,
+                         gt=str.__gt__, ge=str.__ge__)
+Instance(Ord, float).where(lt=float.__lt__, le=float.__le__,
+                           gt=float.__gt__, ge=float.__ge__)
+Instance(Ord, complex).where(lt=complex.__lt__, le=complex.__le__,
+                             gt=complex.__gt__, ge=complex.__ge__)
+Instance(Ord, list).where(lt=list.__lt__, le=list.__le__,
+                          gt=list.__gt__, ge=list.__ge__)
+Instance(Ord, tuple).where(lt=tuple.__lt__, le=tuple.__le__,
+                           gt=tuple.__gt__, ge=tuple.__ge__)
+Instance(Ord, set).where(lt=set.__lt__, le=set.__le__,
+                         gt=set.__gt__, ge=set.__ge__)
+Instance(Ord, dict).where(lt=dict.__lt__, le=dict.__le__,
+                          gt=dict.__gt__, ge=dict.__ge__)
+Instance(Ord, unicode).where(lt=unicode.__lt__, le=unicode.__le__,
+                             gt=unicode.__gt__, ge=unicode.__ge__)
