@@ -1,11 +1,11 @@
 from PyskellTypeSystem import TypeClass
 from PyskellTypeSystem import is_builtin_type
 from PyskellTypeSystem import add_instance
+from PyskellTypeSystem import nt_to_tuple
 
 from Syntax.Basic import TS
 from Syntax.Basic import C
 from Syntax.Basic import Instance
-from Syntax.Pattern import nt_to_tuple
 import operator
 
 
