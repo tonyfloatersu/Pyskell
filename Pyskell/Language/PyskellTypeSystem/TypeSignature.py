@@ -63,19 +63,7 @@ def make_func_type(type_para_list):
 
 
 def type_sig_arg_build(argument, constraints, type_var_dict):
-    if isinstance(argument, list) and len(argument) == 1:
-        return ListType(type_sig_arg_build(argument[0],
-                                           constraints,
-                                           type_var_dict))
-    elif isinstance(argument, tuple):
-        return TupleType(list(map(lambda x:
-                                  type_sig_arg_build(x,
-                                                     constraints,
-                                                     type_var_dict),
-                                  argument)))
-    elif isinstance(argument, type):
-        return TypeOperator(argument, [])
-    elif isinstance(argument, str) and argument.islower():
+    if isinstance(argument, str) and argument.islower():
         if argument not in type_var_dict:
             if argument in constraints:
                 type_var_dict[argument] = \
@@ -83,8 +71,6 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
             else:
                 type_var_dict[argument] = TypeVariable()
         return type_var_dict[argument]
-    elif argument is None:
-        return TypeOperator(None, [])
     elif isinstance(argument, TypeSignature):
         """
         Due to the Syntax of Python, Tuple is used
@@ -92,7 +78,6 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
         """
         return make_func_type(type_sig_build(argument, type_var_dict))
     elif isinstance(argument, TypeSignatureHigherKind):
-        global higher_kind
         if type(argument.constructor) is str:
             higher_kind = type_sig_arg_build(argument.constructor,
                                              constraints,
@@ -105,6 +90,20 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
                                                         constraints,
                                                         type_var_dict),
                                      argument.parameters)))
+    elif argument is None:
+        return TypeOperator(None, [])
+    elif isinstance(argument, list) and len(argument) == 1:
+        return ListType(type_sig_arg_build(argument[0],
+                                           constraints,
+                                           type_var_dict))
+    elif isinstance(argument, tuple):
+        return TupleType(list(map(lambda x:
+                                  type_sig_arg_build(x,
+                                                     constraints,
+                                                     type_var_dict),
+                                  argument)))
+    elif isinstance(argument, type):
+        return TypeOperator(argument, [])
     raise TypeSignatureError(
         "Type Signature Fail to Build Argument: {}".format(argument)
     )

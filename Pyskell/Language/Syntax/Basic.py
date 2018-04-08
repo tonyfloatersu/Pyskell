@@ -3,18 +3,18 @@ from inspect import isclass
 from collections import defaultdict
 
 
-def _t(obj):
+def ct(obj):
     return str(type_of(obj))
 
 
-def _q(quit_status=None):
+def cq(quit_status=None):
     if quit_status is None:
         quit()
     else:
         quit(quit_status)
 
 
-__magic_methods__ = ["__%s__" % s for s in {
+__magic_methods__ = ["__{}__".format(s) for s in {
     "len", "getitem", "setitem", "delitem", "iter", "reversed", "contains",
     "missing", "delattr", "call", "enter", "exit", "eq", "ne", "gt", "lt",
     "ge", "le", "pos", "neg", "abs", "invert", "round", "floor", "ceil",
@@ -36,7 +36,7 @@ class Syntax(object):
     def __init__(self, error_message):
         self.__syntax_error_message = error_message
         self.invalid_syntax = SyntaxError(self.__syntax_error_message)
-        replace_magic_methods(Syntax, lambda x, _: self.__raise())
+        replace_magic_methods(Syntax, lambda x, *a: x.__raise())
 
     def __raise(self):
         raise self.invalid_syntax
@@ -95,7 +95,6 @@ class Constraints(Syntax):
                     self.__add_tc_constraints(con)
             else:
                 self.__add_tc_constraints(constraints)
-        return
 
     def __add_tc_constraints(self, con):
         if len(con) != 2 or not isinstance(con, tuple):
@@ -118,7 +117,7 @@ class Constraints(Syntax):
         return self.__div__(other)
 
 
-T_C = Constraints()
+C = Constraints()
 py_func = PythonFunctionType
 
 
@@ -138,3 +137,12 @@ def t(type_constructor, *parameters):
     parameters = [i.signature if isinstance(i, Signature) else i
                   for i in parameters]
     return TypeSignatureHigherKind(type_constructor, parameters)
+
+
+def typify_py_func(fn, high=None):
+    if not is_py_func_type(fn):
+        raise TypeError("Provided not Python Function Type")
+    type_name_list = ["a" + str(i) for i in range(fn.func_code.co_argcount + 1)]
+    if high is not None:
+        type_name_list[-1] = high(type_name_list[-1])
+    return TS(Signature(type_name_list, []))
