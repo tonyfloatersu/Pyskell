@@ -64,4 +64,4 @@ class QuickLambda(Syntax):
     __le__ = wrapped(operator.le)
 
 
-__ = QuickLambda("rua")
+__ = QuickLambda("Quick Lambda Error")
