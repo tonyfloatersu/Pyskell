@@ -33,7 +33,7 @@ class QuickLambda(Syntax):
     __rsub__ = wrapped(flipper(operator.sub))
     __div__ = wrapped(operator.div)
     __rdiv__ = wrapped(flipper(operator.div))
-    __mul__ = wrapped(operator.sub)
+    __mul__ = wrapped(operator.mul)
     __rmul__ = wrapped(flipper(operator.mul))
     __truediv__ = wrapped(operator.truediv)
     __rtruediv__ = wrapped(flipper(operator.truediv))

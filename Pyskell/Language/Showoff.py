@@ -17,4 +17,6 @@ def flipper(fn, y, _x):
 
 print flipper % some_func % False * (__ + 1) % 1
 
-print (__ + "var") * (__ + "abc") % "char"
+print (__ + " retarded") * (__ + " are") % "you"
+
+print (__ + 514) * (__ * 1000) % 114
