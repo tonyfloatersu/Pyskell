@@ -20,3 +20,11 @@ print flipper % some_func % False * (__ + 1) % 1
 print (__ + " retarded") * (__ + " are") % "you"
 
 print (__ + 514) * (__ * 1000) % 114
+
+
+@TS(C[(Show, "a"), (Show, "b")] / "a" >> "b" >> str)
+def show_2(var1, var2):
+    return show(var1) + show(var2)
+
+
+print show_2 % 1 % "a"
