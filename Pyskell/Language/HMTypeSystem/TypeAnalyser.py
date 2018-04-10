@@ -94,6 +94,8 @@ def fresh(t, non_generic):
                 return map_to[p]
             else:
                 return p
+        elif isinstance(p, Arrow):
+            return Arrow(p.types[0], p.types[1])
         elif isinstance(p, TypeOperator):
             return TypeOperator(p.name, [fresh_closure(i) for i in p.types])
     return fresh_closure(t)
