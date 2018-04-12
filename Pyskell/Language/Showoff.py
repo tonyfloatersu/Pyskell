@@ -28,3 +28,11 @@ def show_2(var1, var2):
 
 
 print show_2 % 1 % "a"
+
+
+@TS(C / int >> int)
+def p1(v):
+    return v + 1
+
+
+print ("answer is " + __) * show * (__ * 6) * p1 % 6
