@@ -48,3 +48,5 @@ for i in l3:
     if i > 10:
         break
     print i
+
+print show % (3 ^ (1 ^ l2))
