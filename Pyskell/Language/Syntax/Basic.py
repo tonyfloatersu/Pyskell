@@ -7,13 +7,6 @@ def ct(obj):
     return str(type_of(obj))
 
 
-def cq(quit_status=None):
-    if quit_status is None:
-        quit()
-    else:
-        quit(quit_status)
-
-
 __magic_methods__ = ["__{}__".format(s) for s in {
     "len", "getitem", "setitem", "delitem", "iter", "reversed", "contains",
     "missing", "delattr", "call", "enter", "exit", "eq", "ne", "gt", "lt",

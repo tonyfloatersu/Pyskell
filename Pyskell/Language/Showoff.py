@@ -50,6 +50,14 @@ for i in l3:
         break
     print i
 
-print show % (3 ^ (1 ^ l2))
+print show % (3 ^ (2 ^ l2))
 
 print l2 != l3
+
+
+@TS(C / [int] >> int)
+def summer(var):
+    return sum(var)
+
+
+print summer % L[1, ..., 10]
