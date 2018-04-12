@@ -129,9 +129,6 @@ class Ord(Eq):
                                   "le": lambda x, y: __le__(x, y),
                                   "ge": lambda x, y: __ge__(x, y)})
 
-        if not is_builtin_type(_type):
-            _type.__lt__ = __lt__
-
     @classmethod
     def derive_instance(cls, _type):
         def zip_adt_cmp(x, y, fn):

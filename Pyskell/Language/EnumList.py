@@ -217,14 +217,14 @@ class HaskellList(OriginType, collections.Sequence):
             return -other.__cmp__(self)
         return 0
 
+    def __eq__(self, other):
+        return cmp(self, other) == 0
+
     def __le__(self, other):
         return cmp(self, other) in (0, -1)
 
     def __lt__(self, other):
         return cmp(self, other) == -1
-
-    def __eq__(self, other):
-        return cmp(self, other) == 0
 
     def __gt__(self, other):
         return cmp(self, other) == 1

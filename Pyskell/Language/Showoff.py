@@ -27,7 +27,7 @@ def show_2(var1, var2):
     return show(var1) + show(var2)
 
 
-print show_2 % 1 % "a"
+print show_2 % 1 * show % 12
 
 
 @TS(C / int >> int)
@@ -36,3 +36,8 @@ def p1(v):
 
 
 print ("answer is " + __) * show * (__ * 6) * p1 % 6
+
+l1 = L[1, ...]
+l2 = L[[1]]
+
+print l1 >= l2
