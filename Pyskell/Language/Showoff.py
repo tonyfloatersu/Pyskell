@@ -37,10 +37,11 @@ def p1(v):
 
 print ("answer is " + __) * show * (__ * 6) * p1 % 6
 
-l1 = L[1, ...]
+l1 = L[1, 2, ...]
 l2 = L[[1]]
 
-print l1 != l2
+print l1 > l2
+print l1 < l2
 
 
 l3 = L[1, 2, ...]
@@ -50,3 +51,5 @@ for i in l3:
     print i
 
 print show % (3 ^ (1 ^ l2))
+
+print l2 != l3

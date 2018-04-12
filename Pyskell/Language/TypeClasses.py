@@ -142,6 +142,11 @@ class Ord(Eq):
                           le=lambda x, y: zip_adt_cmp(x, y, operator.le),
                           gt=lambda x, y: zip_adt_cmp(x, y, operator.gt),
                           ge=lambda x, y: zip_adt_cmp(x, y, operator.ge))
+        if not is_builtin_type(_type):
+            _type.__lt__ = __lt__
+            _type.__gt__ = __gt__
+            _type.__le__ = __le__
+            _type.__ge__ = __ge__
 
 
 Instance(Ord, str).where(lt=str.__lt__, le=str.__le__,
