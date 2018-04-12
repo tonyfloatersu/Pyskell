@@ -40,4 +40,11 @@ print ("answer is " + __) * show * (__ * 6) * p1 % 6
 l1 = L[1, ...]
 l2 = L[[1]]
 
-print l1 >= l2
+print l1 != l2
+
+
+l3 = L[1, 2, ...]
+for i in l3:
+    if i > 10:
+        break
+    print i
