@@ -97,7 +97,7 @@ class VariableAccess(Syntax):
 
 class UnmatchedCase(Syntax):
     def __or__(self, other):
-        if isinstance(other, MatchedCase):
+        if other.is_matched:
             MatchStack.get_frame().matched = True
             return MatchedCase(other.value)
         return self
