@@ -1,8 +1,7 @@
-from TypeClasses import *
-from Syntax import __
-from EnumList import *
-from PyskellTypeSystem import *
-from HMTypeSystem import *
+from Pyskell.Language.TypeClasses import *
+from Pyskell.Language.Syntax import __
+from Pyskell.Language.EnumList import *
+from Pyskell.Language.PyskellTypeSystem import *
 
 
 @TS(C / int >> bool >> str)
