@@ -44,9 +44,9 @@ print l1 > l2
 print l1 < l2
 
 
-l3 = L[1, 2, ...]
-for i in l3:
-    if i > 10:
+l3 = L[1, 3, ...]
+for i in L[1, 3, ...]:
+    if i > 20:
         break
     print i
 
@@ -61,3 +61,15 @@ def summer(var):
 
 
 print summer % L[1, ..., 10]
+
+print show % 1
+print show % 1.1
+print show % [1, 2, 3]
+print show % L[1, 2, 3]
+print show % "retarded"
+print show % complex(1, 1)
+print show % {1, 1, 4, 5, 1, 4}
+print show % {"pattern 1": 1,
+              "pattern 2": 2}
+
+print type_of(show * ((__ + " verb test") ** (C / str >> str)))

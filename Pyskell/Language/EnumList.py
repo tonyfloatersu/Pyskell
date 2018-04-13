@@ -62,7 +62,13 @@ class Enum(TypeClass):
 
     @classmethod
     def derive_instance(cls, _type):
-        pass
+        for data_con in _type.__constructors__:
+            if not isinstance(data_con, _type):
+                raise TypeError("Cannot Derive Enum for {}"
+                                .format(data_con.__name__))
+        Enum.make_instance(_type,
+                           fromEnum=lambda x: _type.__constructors__.index(x),
+                           toEnum=lambda x: _type.__constructors__[x])
 
 
 @TS(C / "a" >> int)

@@ -165,3 +165,27 @@ Instance(Ord, dict).where(lt=dict.__lt__, le=dict.__le__,
                           gt=dict.__gt__, ge=dict.__ge__)
 Instance(Ord, unicode).where(lt=unicode.__lt__, le=unicode.__le__,
                              gt=unicode.__gt__, ge=unicode.__ge__)
+
+
+class Bounded(TypeClass):
+    @classmethod
+    def make_instance(cls, _type, **args):
+        if "minBound" not in args or "maxBound" not in args:
+            raise KeyError("No Bound Entry")
+        add_instance(Bounded, _type, {"minBound": args["minBound"],
+                                      "maxBound": args["maxBound"]})
+
+    @classmethod
+    def derive_instance(cls, _type):
+        for data_con in _type.__constructors__:
+            if not isinstance(data_con, _type):
+                raise TypeError("Cannot Derive Bounded for {}"
+                                .format(data_con.__name__))
+        Bounded.make_instance(_type,
+                              minBound=_type.__constructors__[0],
+                              maxBound=_type.__constructors__[-1])
+
+
+@TS(C[(Bounded, "a")] / "a" >> ("a", "a"))
+def bounds(sample):
+    return Bounded[sample].minBound, Bounded[sample].maxBound
