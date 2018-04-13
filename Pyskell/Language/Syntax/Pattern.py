@@ -1,4 +1,3 @@
-from Pyskell.Language.PyskellTypeSystem import *
 from collections import deque
 from Basic import *
 
@@ -128,3 +127,7 @@ class CaseOf(UnmatchedCase):
         if isinstance(value, undefined):
             raise TypeError("Undefined for Case Of")
         MatchStack.push(value)
+
+
+b = VariableBinding("Syntax error in pattern match")
+a = VariableAccess("Syntax error in pattern match")
