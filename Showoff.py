@@ -2,6 +2,7 @@ from Pyskell.Language.TypeClasses import *
 from Pyskell.Language.Syntax import __
 from Pyskell.Language.EnumList import *
 from Pyskell.Language.PyskellTypeSystem import *
+from Pyskell.Language.Syntax.Pattern import *
 
 
 @TS(C / int >> bool >> str)
@@ -72,3 +73,12 @@ print show % {"pattern 1": 1,
               "pattern 2": 2}
 
 print type_of(show * ((__ + " verb test") ** (C / str >> str)))
+
+
+print ~(CaseOf((2, 3))
+        | pb((2, pb.v2)) >> va.v2
+        | pb(2) >> -2
+        | pb(pb.var) >> va.var)
+
+print show % ~(CaseOf(L[3, 2, 1, 0])
+               | pb(3 ^ (2 ^ pb.a)) >> va.a)

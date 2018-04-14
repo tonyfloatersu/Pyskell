@@ -44,6 +44,7 @@ class PatternBindingList(Syntax, PatternMatchListBind):
 
     def __rxor__(self, other):
         self.head.insert(0, other)
+        return self
 
 
 class PatternBinding(Syntax, PatternMatchBind):
@@ -98,7 +99,7 @@ class UnmatchedCase(Syntax):
     def __or__(self, other):
         if other.is_matched:
             MatchStack.get_frame().matched = True
-            return MatchedCase(other.value)
+            return MatchedCase(other.ret_val)
         return self
 
     def __invert__(self):
@@ -124,10 +125,10 @@ class MatchedCase(Syntax):
 class CaseOf(UnmatchedCase):
     def __init__(self, value):
         super(CaseOf, self).__init__("Error in CaseOf")
-        if isinstance(value, undefined):
+        if isinstance(value, SyntaxUndefined):
             raise TypeError("Undefined for Case Of")
         MatchStack.push(value)
 
 
-b = VariableBinding("Syntax error in pattern match")
-a = VariableAccess("Syntax error in pattern match")
+pb = VariableBinding("Syntax error in pattern match")
+va = VariableAccess("Syntax error in pattern match")
