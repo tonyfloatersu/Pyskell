@@ -3,6 +3,7 @@ from Pyskell.Language.Syntax import __
 from Pyskell.Language.EnumList import *
 from Pyskell.Language.PyskellTypeSystem import *
 from Pyskell.Language.Syntax.Pattern import *
+from Pyskell.Language.Syntax.Guard import *
 
 
 @TS(C / int >> bool >> str)
@@ -56,8 +57,8 @@ print l2 != l3
 
 
 @TS(C / [int] >> int)
-def summer(var):
-    return sum(var)
+def summer(_var):
+    return sum(_var)
 
 
 print summer % L[1, ..., 10]
@@ -95,3 +96,9 @@ for i in var:
     if i > 10:
         break
     print i
+
+
+print ~(Guard(1000)
+        | g(__ > 100) >> "rua"
+        | g(__ < -100) >> "aur"
+        | otherwise >> "fit")
