@@ -80,5 +80,18 @@ print ~(CaseOf((2, 3))
         | pb(2) >> -2
         | pb(pb.var) >> va.var)
 
-print show % ~(CaseOf(L[3, 2, 1, 0])
-               | pb(3 ^ (2 ^ pb.a)) >> va.a)
+
+print ~(CaseOf([1, 2, [3, 4]])
+        | pb(1 ^ (2 ^ pb.x)) >> va.x
+        | pb(pb.v) >> False)
+
+
+var = ~(CaseOf(L[1, ...])
+        | pb(1 ^ pb.l) >> va.l
+        | pb(pb.x) >> L[[]])
+
+
+for i in var:
+    if i > 10:
+        break
+    print i
