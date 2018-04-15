@@ -12,3 +12,8 @@
 
 <img src="https://raw.githubusercontent.com/syl20bnr/spacemacs/master/layers/%2Blang/python/img/python.png" width="125"/> <img src="https://cdn.codementor.io/assets/topic/category_header/haskell-019c0d6e102e573012c2ab2cdd153b74.png" width="115"/>
 
+## TODOs
+
+- Move all the `showoff.py` functions into test section.
+- Add `Data` section modules.
+
