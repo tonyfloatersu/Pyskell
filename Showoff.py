@@ -4,6 +4,7 @@ from Pyskell.Language.EnumList import *
 from Pyskell.Language.PyskellTypeSystem import *
 from Pyskell.Language.Syntax.Pattern import *
 from Pyskell.Language.Syntax.Guard import *
+from Pyskell.Language.Syntax.ADTs import *
 
 
 @TS(C / int >> bool >> str)
@@ -97,3 +98,15 @@ for i in var:
 
 print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
                             | otherwise >> "fit")
+
+
+Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq)
+print V1 == V1
+
+Instance(Show, Unit).where(
+    show=lambda x: ~(Guard(x) | g(__ == V1) >> "a"
+                              | g(__ == V2) >> "b"
+                              | g(__ == V3) >> "c")
+)
+
+print show % V1

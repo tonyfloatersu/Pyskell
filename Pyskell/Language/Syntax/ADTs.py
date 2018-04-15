@@ -19,7 +19,7 @@ class DerivingTypeClasses(Syntax):
     def __init__(self, *type_classes):
         super(DerivingTypeClasses, self).__init__("Syntax Error in deriving")
         for t in type_classes:
-            if not isinstance(t, TypeClass):
+            if not issubclass(t, TypeClass):
                 raise TypeError("Non type-class error {}".format(t))
         self.type_classes = type_classes
 
@@ -101,7 +101,7 @@ class D(Syntax):
         return SyntaxBuildDataConstructor(item)
 
 
-d = D
+d = D()
 
 
 class SyntaxTypeConstructor(Syntax):
@@ -110,7 +110,7 @@ class SyntaxTypeConstructor(Syntax):
         self.name = t_name
         self.args = t_args
 
-    def __rshift__(self, other):
+    def __eq__(self, other):
         if isinstance(other, SyntaxDataConstructor):
             return build_adt(self.name, self.args,
                              [(other.name, other.args)],
@@ -149,4 +149,4 @@ class Data(Syntax):
         return SyntaxCalledTypeConstructor(item)
 
 
-data = Data
+data = Data()

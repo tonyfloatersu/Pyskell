@@ -74,8 +74,6 @@ class Eq(TypeClass):
 
     @classmethod
     def derive_instance(cls, _type):
-        if not hasattr(_type.__class__, "_fields"):
-            raise TypeError("Fail to derive Eq")
 
         def __eq__(self, other):
             return self.__class__ == other.__class__ \
