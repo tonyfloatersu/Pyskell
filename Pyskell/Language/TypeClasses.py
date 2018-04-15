@@ -42,7 +42,7 @@ def show(o):
     return Show[o].show(o)
 
 
-Instance(Show, str).where(show=str.__repr__)
+Instance(Show, str).where(show=str.__str__)
 Instance(Show, int).where(show=int.__str__)
 Instance(Show, float).where(show=tuple.__str__)
 Instance(Show, long).where(show=long.__str__)

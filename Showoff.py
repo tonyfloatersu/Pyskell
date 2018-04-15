@@ -20,10 +20,6 @@ def flipper(fn, y, _x):
 
 print flipper % some_func % False * (__ + 1) % 1
 
-print (__ + " retarded") * (__ + " are") % "you"
-
-print (__ + 514) * (__ * 1000) % 114
-
 
 @TS(C[(Show, "a"), (Show, "b")] / "a" >> "b" >> str)
 def show_2(var1, var2):
@@ -65,36 +61,8 @@ def summer(_var):
 
 print summer % L[1, ..., 10]
 
-print show % 1
-print show % 1.1
-print show % [1, 2, 3]
-print show % L[1, 2, 3]
-print show % "retarded"
-print show % complex(1, 1)
-print show % {1, 1, 4, 5, 1, 4}
-print show % {"pattern 1": 1,
-              "pattern 2": 2}
 
 print type_of(show * ((__ + " verb test") ** (C / str >> str)))
-
-
-print ~(CaseOf((2, 3)) | pb((2, pb.v2)) >> va.v2
-                       | pb(2) >> -2
-                       | pb(pb.var) >> va.var)
-
-
-print ~(CaseOf([1, 2, [3, 4]]) | pb(1 ^ (2 ^ pb.x)) >> va.x
-                               | pb(pb.v) >> False)
-
-
-var = ~(CaseOf(L[1, ...]) | pb(1 ^ pb.l) >> va.l
-                          | pb(pb.x) >> L[[]])
-
-
-for i in var:
-    if i > 10:
-        break
-    print i
 
 
 print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
@@ -124,5 +92,8 @@ print V1 < V3
 print fromEnum(V3)
 v1, v2 = bounds(V1)
 print show % v1, show % v2
-for i in L[v1, ..., v2]:
+some_list = L[v1, ..., v2]
+for i in some_list:
     print show % i
+
+print show % some_list

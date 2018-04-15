@@ -1,5 +1,6 @@
 from collections import deque
 from Basic import *
+from Pyskell.Language.TypeClasses import show
 
 
 class MatchStackFrame(object):
@@ -105,7 +106,10 @@ class UnmatchedCase(Syntax):
     def __invert__(self):
         val = MatchStack.get_frame().value
         MatchStack.pop()
-        raise RuntimeError("Error in Case Match: {}".format(val))
+        if is_builtin_type(val):
+            raise RuntimeError("Error in Case Match: {}".format(val))
+        else:
+            return RuntimeError("Error in Case Match: {}".format(show % val))
 
 
 class MatchedCase(Syntax):
