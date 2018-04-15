@@ -63,9 +63,9 @@ class Eq(TypeClass):
         def default_ne(self, other):
             return not args["eq"](self, other)
 
-        __eq__ = args["eq"] ** (C / "a" >> "a" >> bool)
+        __eq__ = args["eq"] ** (C / "a" >> "b" >> bool)
         __ne__ = (default_ne if "ne" not in args
-                  else args["ne"]) ** (C / "a" >> "a" >> bool)
+                  else args["ne"]) ** (C / "a" >> "b" >> bool)
         add_instance(Eq, _type, {"eq": lambda x, y: __eq__(x, y),
                                  "ne": lambda x, y: __ne__(x, y)})
         if not is_builtin_type(_type):
@@ -76,12 +76,18 @@ class Eq(TypeClass):
     def derive_instance(cls, _type):
 
         def __eq__(self, other):
-            return self.__class__ == other.__class__ \
-                   and nt_to_tuple(self) == nt_to_tuple(other)
+            if self.__class__ == other.__class__:
+                return self.__class__ == other.__class__ \
+                       and nt_to_tuple(self) == nt_to_tuple(other)
+            return False
 
         def __ne__(self, other):
-            return self.__class__ != other.__class__ \
-                   or nt_to_tuple(self) == nt_to_tuple(other)
+            if self.__class__ != other.__class__:
+                return True
+            elif nt_to_tuple(self) != nt_to_tuple(other):
+                return True
+            else:
+                return False
 
         Eq.make_instance(_type, eq=__eq__, ne=__ne__)
 

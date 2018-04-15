@@ -5,6 +5,7 @@ from Pyskell.Language.PyskellTypeSystem import *
 from Pyskell.Language.Syntax.Pattern import *
 from Pyskell.Language.Syntax.Guard import *
 from Pyskell.Language.Syntax.ADTs import *
+from Pyskell.Language.EnumList import *
 
 
 @TS(C / int >> bool >> str)
@@ -100,14 +101,14 @@ print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
                             | otherwise >> "fit")
 
 
-Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq, Ord)
+Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq, Ord, Enum, Bounded)
 print V1 == V1
 
 
 Instance(Show, Unit).where(
-    show=lambda x: ~(Guard(x) | g(__ == V1) >> "a"
-                              | g(__ == V2) >> "b"
-                              | otherwise >> "c")
+    show=lambda _x: ~(Guard(_x) | g(__ == V1) >> "a"
+                                | g(__ == V2) >> "b"
+                                | otherwise >> "c")
 )
 
 """
@@ -120,3 +121,8 @@ Instance(Show, Unit).where(
 
 print show % V3
 print V1 < V3
+print fromEnum(V3)
+v1, v2 = bounds(V1)
+print show % v1, show % v2
+for i in L[v1, ..., v2]:
+    print show % i
