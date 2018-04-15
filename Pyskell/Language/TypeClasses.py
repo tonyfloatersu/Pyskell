@@ -126,25 +126,25 @@ class Ord(Eq):
                                   "gt": lambda x, y: __gt__(x, y),
                                   "le": lambda x, y: __le__(x, y),
                                   "ge": lambda x, y: __ge__(x, y)})
+        if not is_builtin_type(_type):
+            _type.__lt__ = lambda x, y: __lt__(x, y)
+            _type.__gt__ = lambda x, y: __gt__(x, y)
+            _type.__le__ = lambda x, y: __le__(x, y)
+            _type.__ge__ = lambda x, y: __ge__(x, y)
 
     @classmethod
     def derive_instance(cls, _type):
         def zip_adt_cmp(x, y, fn):
-            if x.__ADT_slot__ == y.__ADT_slot__:
+            if x.__ADT__slot__order__ == y.__ADT__slot__order__:
                 if len(nt_to_tuple(x)) == 0:
                     return fn((), ())
                 return fn(nt_to_tuple(x), nt_to_tuple(y))
-            return fn(x.__ADT_slot__, y.__ADT_slot__)
+            return fn(x.__ADT__slot__order__, y.__ADT__slot__order__)
         Ord.make_instance(_type,
                           lt=lambda x, y: zip_adt_cmp(x, y, operator.lt),
                           le=lambda x, y: zip_adt_cmp(x, y, operator.le),
                           gt=lambda x, y: zip_adt_cmp(x, y, operator.gt),
                           ge=lambda x, y: zip_adt_cmp(x, y, operator.ge))
-        if not is_builtin_type(_type):
-            _type.__lt__ = __lt__
-            _type.__gt__ = __gt__
-            _type.__le__ = __le__
-            _type.__ge__ = __ge__
 
 
 Instance(Ord, str).where(lt=str.__lt__, le=str.__le__,

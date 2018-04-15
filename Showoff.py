@@ -100,7 +100,7 @@ print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
                             | otherwise >> "fit")
 
 
-Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq)
+Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq, Ord)
 print V1 == V1
 
 
@@ -119,3 +119,4 @@ Instance(Show, Unit).where(
 """
 
 print show % V3
+print V1 < V3
