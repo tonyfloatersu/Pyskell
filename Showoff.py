@@ -103,10 +103,19 @@ print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
 Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 & deriving(Eq)
 print V1 == V1
 
+
 Instance(Show, Unit).where(
     show=lambda x: ~(Guard(x) | g(__ == V1) >> "a"
                               | g(__ == V2) >> "b"
-                              | g(__ == V3) >> "c")
+                              | otherwise >> "c")
 )
 
-print show % V1
+"""
+Instance(Show, Unit).where(
+    show=lambda x: ~(CaseOf(x) | pb(V1) >> "a"
+                               | pb(V2) >> "b"
+                               | pb(V3) >> "c")
+)
+"""
+
+print show % V3
