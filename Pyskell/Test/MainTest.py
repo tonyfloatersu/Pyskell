@@ -1,4 +1,4 @@
-from Language.HMTypeSystemTest import *
+from TestCases import *
 
 
 if __name__ == '__main__':

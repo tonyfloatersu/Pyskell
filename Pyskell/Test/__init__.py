@@ -1,1 +1,1 @@
-from Language import *
+from TestCases import *

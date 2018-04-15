@@ -1,9 +1,17 @@
 import unittest
 from Pyskell.Language.Syntax.QuickLambda import __
+from Pyskell.Language.TypeClasses import show
+from Pyskell.Language.Syntax import *
 
 
 class TestQuickLambda(unittest.TestCase):
     def test_ql(self):
+
+        @TS(C / int >> int)
+        def p1(v):
+            return v + 1
+
+        self.assertTrue("answer is 42", ("answer is " + __) * show * (__ * 6) * p1 % 6)
         self.assertEqual(114514, (__ + 514) * (__ * 1000) % 114)
         self.assertEqual("you are retarded",
                          (__ + " retarded") * (__ + " are") % "you")
