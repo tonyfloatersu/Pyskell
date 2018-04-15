@@ -76,20 +76,17 @@ print show % {"pattern 1": 1,
 print type_of(show * ((__ + " verb test") ** (C / str >> str)))
 
 
-print ~(CaseOf((2, 3))
-        | pb((2, pb.v2)) >> va.v2
-        | pb(2) >> -2
-        | pb(pb.var) >> va.var)
+print ~(CaseOf((2, 3)) | pb((2, pb.v2)) >> va.v2
+                       | pb(2) >> -2
+                       | pb(pb.var) >> va.var)
 
 
-print ~(CaseOf([1, 2, [3, 4]])
-        | pb(1 ^ (2 ^ pb.x)) >> va.x
-        | pb(pb.v) >> False)
+print ~(CaseOf([1, 2, [3, 4]]) | pb(1 ^ (2 ^ pb.x)) >> va.x
+                               | pb(pb.v) >> False)
 
 
-var = ~(CaseOf(L[1, ...])
-        | pb(1 ^ pb.l) >> va.l
-        | pb(pb.x) >> L[[]])
+var = ~(CaseOf(L[1, ...]) | pb(1 ^ pb.l) >> va.l
+                          | pb(pb.x) >> L[[]])
 
 
 for i in var:
@@ -98,7 +95,5 @@ for i in var:
     print i
 
 
-print ~(Guard(1000)
-        | g(__ > 100) >> "rua"
-        | g(__ < -100) >> "aur"
-        | otherwise >> "fit")
+print ~(Guard(L[1, ..., 5]) | g(lambda x: len(x) > 100) >> "rua"
+                            | otherwise >> "fit")
