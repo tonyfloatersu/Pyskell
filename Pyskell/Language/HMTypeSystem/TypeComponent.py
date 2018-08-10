@@ -68,7 +68,7 @@ class Arrow(TypeOperator):
     """Bin-ary type constructor to build function types"""
 
     def __init__(self, from_type, to_type):
-        super(self.__class__, self).__init__("->", [from_type, to_type])
+        super().__init__("->", [from_type, to_type])
 
     def __repr__(self):
         """represent with (a -> b) type"""
@@ -81,7 +81,7 @@ class TupleType(TypeOperator):
 
     def __init__(self, types):
         """call TypeOperator typename tuple and type list"""
-        super(self.__class__, self).__init__(tuple, types)
+        super().__init__(tuple, types)
 
     def __repr__(self):
         """show in (a_i ... a_j) format"""
@@ -97,7 +97,7 @@ class ListType(TypeOperator):
          (python list is very easy on type, but this list is strong type)
         and types with only [list_type]
         """
-        super(self.__class__, self).__init__("[]", [list_type])
+        super().__init__("[]", [list_type])
 
     def __repr__(self):
         """represent with [type]"""

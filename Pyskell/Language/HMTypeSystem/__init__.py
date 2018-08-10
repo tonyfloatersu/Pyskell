@@ -1,3 +1,3 @@
-from Pyskell.Language.HMTypeSystem.SyntaxComponent import *
-from Pyskell.Language.HMTypeSystem.TypeComponent import *
-from Pyskell.Language.HMTypeSystem.TypeAnalyser import *
+from .SyntaxComponent import *
+from .TypeComponent import *
+from .TypeAnalyser import *

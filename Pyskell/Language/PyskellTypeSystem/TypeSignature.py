@@ -3,7 +3,7 @@ Types, identify yourself!
 Even if you are a function/mono-type/monad!
 It's somewhat about static type and Py-skell layer of type
 """
-from Pyskell.Language.HMTypeSystem import *
+from ..HMTypeSystem import *
 import types
 
 __python_builtins__ = {

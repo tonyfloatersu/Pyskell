@@ -1,5 +1,5 @@
-from TypeComponent import *
-from SyntaxComponent import *
+from .TypeComponent import *
+from .SyntaxComponent import *
 
 
 def prune(tp):
@@ -46,40 +46,47 @@ def is_generic(tp, not_generic):
     return not occur_in(tp, not_generic)
 
 
+def unify_type_var(tv, tp):
+    if tv != tp:
+        if isinstance(tp, TypeVariable):
+            union = tuple(set(tv.constraints + tp.constraints))
+            tv.constraints = union
+            tp.constraints = union
+        if occur_in_type(tv, tp):
+            raise InferenceError("Recursive Type Infinite")
+        tv.instance = tp
+    return
+
+
 def unify_type(tp_1, tp_2):
-    def bind(t_1, t_2):
-        if t_1 != t_2:
-            if isinstance(t_2, TypeVariable):
-                union = tuple(set(t_1.constraints + t_2.constraints))
-                t_1.constraints = union
-                t_2.constraints = union
-            if occur_in_type(t_1, t_2):
-                raise InferenceError("Recursive Type Infinite")
-            t_1.instance = t_2
 
     def unify_type_operator(to_1, to_2):
         # poly
+        # TODO: This part is unclear and need to be improved
         if isinstance(to_1.name, TypeVariable) and len(to_1.types) > 0:
             to_1.name = to_2.name
             to_1.types = to_2.types
             unify_type(to_1, to_2)
         elif isinstance(to_2.name, TypeVariable):
             unify_type(to_2, to_1)
+        ####################################################################
         # mono
         elif to_1.name != to_2.name or len(to_1.types) != len(to_2.types):
             raise InferenceError("Unify Mismatch: {} != {}".format(to_1, to_2))
         for i, j in zip(to_1.types, to_2.types):
             unify_type(i, j)
+        return
 
     type_1, type_2 = prune(tp_1), prune(tp_2)
-    if isinstance(type_1, TypeOperator) and isinstance(type_2, TypeOperator):
+    if isinstance(type_1, TypeVariable):
+        unify_type(type_1, type_2)
+    elif isinstance(type_1, TypeOperator) and isinstance(type_2, TypeVariable):
+        unify_type(type_2, type_1)
+    elif isinstance(type_1, TypeOperator) and isinstance(type_2, TypeOperator):
         unify_type_operator(type_1, type_2)
-    elif isinstance(type_1, TypeVariable):
-        bind(type_1, type_2)
-    elif isinstance(type_2, TypeVariable):
-        bind(type_2, type_1)
     else:
         assert False, "Unify Type fail: {0}, {1}".format(type_1, type_2)
+    return
 
 
 def fresh(t, non_generic):
