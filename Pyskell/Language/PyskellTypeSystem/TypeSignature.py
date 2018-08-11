@@ -7,19 +7,13 @@ from ..HMTypeSystem import *
 import types
 
 __python_builtins__ = {
-    types.BooleanType, types.BufferType, types.BuiltinFunctionType,
-    types.BuiltinMethodType, types.ClassType, types.CodeType,
-    types.ComplexType, types.DictProxyType, types.DictType,
-    types.DictionaryType, types.EllipsisType, types.FileType,
-    types.FloatType, types.FrameType, types.FunctionType,
-    types.GeneratorType, types.GetSetDescriptorType, types.InstanceType,
-    types.IntType, types.LambdaType, types.ListType, types.LongType,
-    types.MemberDescriptorType, types.MethodType, types.ModuleType,
-    types.NoneType, types.NotImplementedType, types.ObjectType,
-    types.SliceType, types.StringType, types.StringTypes,
-    types.TracebackType, types.TupleType, types.TypeType,
-    types.UnboundMethodType, types.UnicodeType, types.XRangeType, set,
-    frozenset}
+    type, bool, dict, float, int, str, tuple, type(None), type(Ellipsis),
+    types.BuiltinFunctionType, types.BuiltinMethodType,
+    types.CodeType, types.DynamicClassAttribute, types.FrameType,
+    types.FunctionType, types.GeneratorType, types.GetSetDescriptorType,
+    types.LambdaType, types.MappingProxyType, types.MemberDescriptorType,
+    types.MethodType, types.TracebackType
+}
 
 
 def is_builtin_type(some_type):
@@ -28,8 +22,7 @@ def is_builtin_type(some_type):
 
 __python_function_types__ = {
     types.FunctionType, types.LambdaType, types.MethodType,
-    types.UnboundMethodType, types.BuiltinFunctionType,
-    types.BuiltinMethodType}
+    types.BuiltinFunctionType, types.BuiltinMethodType}
 
 
 def is_py_func_type(some_type):
@@ -72,24 +65,16 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
                 type_var_dict[argument] = TypeVariable()
         return type_var_dict[argument]
     elif isinstance(argument, TypeSignature):
-        """
-        Due to the Syntax of Python, Tuple is used
-        So I have to let function sig be another type signature
-        """
         return make_func_type(type_sig_build(argument, type_var_dict))
     elif isinstance(argument, TypeSignatureHigherKind):
-        if type(argument.constructor) is str:
-            higher_kind = type_sig_arg_build(argument.constructor,
-                                             constraints,
-                                             type_var_dict)
-        else:
-            higher_kind = argument.constructor
+        higher_kind = type_sig_arg_build(argument.constructor,
+                                         constraints,
+                                         type_var_dict) \
+            if type(argument.constructor) is str \
+            else argument.constructor
         return TypeOperator(higher_kind,
-                            list(map(lambda x:
-                                     type_sig_arg_build(x,
-                                                        constraints,
-                                                        type_var_dict),
-                                     argument.parameters)))
+                            [type_sig_arg_build(x, constraints, type_var_dict)
+                             for x in argument.parameters])
     elif argument is None:
         return TypeOperator(None, [])
     elif isinstance(argument, list) and len(argument) == 1:
@@ -97,11 +82,8 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
                                            constraints,
                                            type_var_dict))
     elif isinstance(argument, tuple):
-        return TupleType(list(map(lambda x:
-                                  type_sig_arg_build(x,
-                                                     constraints,
-                                                     type_var_dict),
-                                  argument)))
+        return TupleType([type_sig_arg_build(x, constraints, type_var_dict)
+                          for x in argument])
     elif isinstance(argument, type):
         return TypeOperator(argument, [])
     raise TypeSignatureError(
@@ -112,9 +94,7 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
 def type_sig_build(type_sig, type_var_dict=None):
     args, constraints = type_sig.args, type_sig.constraints
     type_var_dict = {} if type_var_dict is None else type_var_dict
-    return list(map(lambda x:
-                    type_sig_arg_build(x, constraints, type_var_dict),
-                    args))
+    return [type_sig_arg_build(x, constraints, type_var_dict) for x in args]
 
 
 class PythonFunctionType(object):
