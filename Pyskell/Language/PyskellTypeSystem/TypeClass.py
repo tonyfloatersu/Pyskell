@@ -1,5 +1,5 @@
 from .AlgebraicDataType import ADT
-from .TypeSignature import OriginType, type_of
+from Pyskell.Language.TypeSignature.TypeSignature import OriginType, type_of
 from ..HMTypeSystem import ListType
 from collections import namedtuple
 

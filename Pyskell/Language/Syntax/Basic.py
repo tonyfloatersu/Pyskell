@@ -1,4 +1,4 @@
-from Pyskell.Language.PyskellTypeSystem import *
+from ..PyskellTypeSystem import *
 from inspect import isclass
 from collections import defaultdict
 

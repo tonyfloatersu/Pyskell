@@ -1,11 +1,4 @@
-"""
-it's a function's world...
-but it would be nothing
-without types
-We are going to use some hack methods for
-identify the function identify in environment
-"""
-from TypeSignature import *
+from .TypeSignature import *
 from functools import partial
 
 
@@ -14,7 +7,6 @@ class TypedFunction(OriginType):
         self.fn = func
         self.fn_args = func_args
         self.fn_type = func_type
-        self.__doc__ = func.__doc__
 
     def __type__(self):
         return self.fn_type
