@@ -1,3 +1,2 @@
-from .SyntaxComponent import *
-from .TypeComponent import *
+from .Expression import *
 from .TypeAnalyser import *
