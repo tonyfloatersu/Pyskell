@@ -55,7 +55,7 @@ class TypeVariable(object):
     next_var_name = 0
 
     def __init__(self, constraints=()):
-        self.id = self.__next_var_id
+        self.id_num = self.__next_var_id
         TypeVariable.__next_var_id += 1
         self.constraints = constraints
         self.__name = None
@@ -77,7 +77,7 @@ class TypeVariable(object):
         return self.name
 
     def __repr__(self):
-        return "TypeVariable(id = {0})".format(self.id)
+        return "TypeVariable(id = {0})".format(self.id_num)
 
 
 class TypeOperator(object):
