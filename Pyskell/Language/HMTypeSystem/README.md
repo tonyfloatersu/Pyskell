@@ -90,3 +90,7 @@ $$\begin{equation}\frac{\vdash e : \sigma'\space\sigma' \sqsubseteq \sigma}{\Gam
 $$\frac{\Gamma\vdash e:\sigma\space\alpha\notin free(\Gamma)}{\Gamma \vdash e:\forall \alpha.\sigma}$$
 
 If $\alpha​$ is not free in $\Gamma​$, in another word $\alpha​$ is restricted inside $\Gamma​$, then $e :\forall \alpha . \sigma​$ can be inferred from the provided conditions.
+
+## TODO
+
+The algorithm implemented readily unify the higher-kinded types together, like `f x y` with `g z`. More improvements are required. The problem is located in `unify_type` `poly` part.

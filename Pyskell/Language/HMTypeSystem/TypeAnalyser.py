@@ -1,6 +1,6 @@
-from .Expression import (Arrow, FuncApp, Lambda, Let,
-                         InferenceError, TypeVariable,
-                         TypeOperator, Variable)
+from Expression import (Arrow, FuncApp, Lambda, Let,
+                        InferenceError, TypeVariable,
+                        TypeOperator, Variable)
 
 
 def prune(tp):
@@ -64,9 +64,9 @@ def unify_type(tp_1, tp_2):
 
     type_1, type_2 = prune(tp_1), prune(tp_2)
     if isinstance(type_1, TypeVariable):
-        unify_type(type_1, type_2)
+        unify_type_var(type_1, type_2)
     elif isinstance(type_1, TypeOperator) and isinstance(type_2, TypeVariable):
-        unify_type(type_2, type_1)
+        unify_type_var(type_2, type_1)
     elif isinstance(type_1, TypeOperator) and isinstance(type_2, TypeOperator):
         unify_type_operator(type_1, type_2)
     else:
