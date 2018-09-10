@@ -1,6 +1,6 @@
-from Expression import (Arrow, FuncApp, Lambda, Let,
-                        InferenceError, TypeVariable,
-                        TypeOperator, Variable)
+from .Expression import (Arrow, FuncApp, Lambda, Let,
+                         InferenceError, TypeVariable,
+                         TypeOperator, Variable)
 
 
 def prune(tp):

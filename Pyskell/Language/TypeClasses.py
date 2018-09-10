@@ -1,11 +1,11 @@
-from PyskellTypeSystem import TypeClass
-from PyskellTypeSystem import is_builtin_type
-from PyskellTypeSystem import add_instance
-from PyskellTypeSystem import nt_to_tuple
+from .PyskellTypeSystem import TypeClass
+from .PyskellTypeSystem import is_builtin_type
+from .PyskellTypeSystem import add_instance
+from .PyskellTypeSystem import nt_to_tuple
 
-from Syntax.Basic import TS
-from Syntax.Basic import C
-from Syntax.Basic import Instance
+from .Syntax.Basic import TS
+from .Syntax.Basic import C
+from .Syntax.Basic import Instance
 import operator
 
 
@@ -45,7 +45,6 @@ def show(o):
 Instance(Show, str).where(show=str.__str__)
 Instance(Show, int).where(show=int.__str__)
 Instance(Show, float).where(show=tuple.__str__)
-Instance(Show, long).where(show=long.__str__)
 Instance(Show, complex).where(show=complex.__str__)
 Instance(Show, bool).where(show=bool.__str__)
 Instance(Show, list).where(show=list.__str__)
@@ -100,7 +99,6 @@ Instance(Eq, tuple).where(eq=tuple.__eq__, ne=tuple.__ne__)
 Instance(Eq, set).where(eq=set.__eq__, ne=set.__ne__)
 Instance(Eq, dict).where(eq=dict.__eq__, ne=dict.__ne__)
 Instance(Eq, type).where(eq=type.__eq__, ne=type.__ne__)
-Instance(Eq, unicode).where(eq=unicode.__eq__, ne=unicode.__ne__)
 
 
 class Ord(Eq):
@@ -167,8 +165,6 @@ Instance(Ord, set).where(lt=set.__lt__, le=set.__le__,
                          gt=set.__gt__, ge=set.__ge__)
 Instance(Ord, dict).where(lt=dict.__lt__, le=dict.__le__,
                           gt=dict.__gt__, ge=dict.__ge__)
-Instance(Ord, unicode).where(lt=unicode.__lt__, le=unicode.__le__,
-                             gt=unicode.__gt__, ge=unicode.__ge__)
 
 
 class Bounded(TypeClass):

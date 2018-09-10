@@ -1,5 +1,5 @@
 from collections import deque
-from Basic import *
+from .Basic import *
 from Pyskell.Language.TypeClasses import show
 
 

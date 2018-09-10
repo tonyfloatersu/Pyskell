@@ -1,7 +1,7 @@
 import operator
-from Basic import Syntax
-from Basic import C
-from Basic import TS
+from .Basic import Syntax
+from .Basic import C
+from .Basic import TS
 
 
 class QuickLambda(Syntax):

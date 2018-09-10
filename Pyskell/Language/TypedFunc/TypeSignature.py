@@ -22,7 +22,8 @@ def is_builtin_type(some_type):
 
 __python_function_types__ = {
     types.FunctionType, types.LambdaType, types.MethodType,
-    types.BuiltinFunctionType, types.BuiltinMethodType}
+    types.BuiltinFunctionType, types.BuiltinMethodType
+}
 
 
 def is_py_func_type(some_type):
@@ -59,6 +60,7 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     if isinstance(argument, str) and argument.islower():
         if argument not in type_var_dict:
             if argument in constraints:
+                # TODO: Check `constraints` type is tuple or something
                 type_var_dict[argument] = \
                     TypeVariable(constraints=constraints[argument])
             else:
@@ -67,8 +69,7 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     elif isinstance(argument, TypeSignature):
         return make_func_type(type_sig_build(argument, type_var_dict))
     elif isinstance(argument, TypeSignatureHigherKind):
-        higher_kind = type_sig_arg_build(argument.constructor,
-                                         constraints,
+        higher_kind = type_sig_arg_build(argument.constructor, constraints,
                                          type_var_dict) \
             if type(argument.constructor) is str \
             else argument.constructor
@@ -78,8 +79,7 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     elif argument is None:
         return TypeOperator(None, [])
     elif isinstance(argument, list) and len(argument) == 1:
-        return ListType(type_sig_arg_build(argument[0],
-                                           constraints,
+        return ListType(type_sig_arg_build(argument[0], constraints,
                                            type_var_dict))
     elif isinstance(argument, tuple):
         return TupleType([type_sig_arg_build(x, constraints, type_var_dict)

@@ -24,7 +24,7 @@ class Lambda(object):
         self.expr_body = expr_body
 
     def __str__(self):
-        return "(\{} -> {})".format(self.name, self.expr_body)
+        return "(\\{} -> {})".format(self.name, self.expr_body)
 
 
 class Let(object):
@@ -54,10 +54,10 @@ class TypeVariable(object):
     __next_var_id = 0
     next_var_name = 0
 
-    def __init__(self, constraints=()):
+    def __init__(self, constraints=None):
         self.id_num = self.__next_var_id
         TypeVariable.__next_var_id += 1
-        self.constraints = constraints
+        self.constraints = () if constraints is None else constraints
         self.__name = None
         self.instance = None
 

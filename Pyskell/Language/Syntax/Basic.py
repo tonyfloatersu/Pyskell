@@ -79,15 +79,18 @@ class Signature(Syntax):
 
 
 class Constraints(Syntax):
-    def __init__(self, constraints=()):
+    def __init__(self, constraints=None):
         super(Constraints, self).__init__("Syntax Error in Type Signature")
         self.constraints = defaultdict(list)
-        if len(constraints) > 0:
-            if isinstance(constraints[0], tuple):
-                for con in constraints:
-                    self.__add_tc_constraints(con)
-            else:
-                self.__add_tc_constraints(constraints)
+        if hasattr(constraints, "__len__"):
+            if len(constraints) > 0:
+                if isinstance(constraints[0], tuple):
+                    for con in constraints:
+                        self.__add_tc_constraints(con)
+                else:
+                    self.__add_tc_constraints(constraints)
+        else:
+            assert False
 
     def __add_tc_constraints(self, con):
         if len(con) != 2 or not isinstance(con, tuple):
