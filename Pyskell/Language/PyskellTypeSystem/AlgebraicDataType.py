@@ -9,6 +9,9 @@ from collections import namedtuple
 
 
 class ADT(OriginType):
+
+    __slots__ = '__type_constructor__'
+
     """
     Everything about ADT starts here
     """

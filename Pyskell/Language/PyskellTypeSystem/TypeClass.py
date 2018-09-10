@@ -1,10 +1,11 @@
 from .AlgebraicDataType import ADT
-from Pyskell.Language.TypedFunc.TypeSignature import OriginType, type_of
+from ..TypedFunc.TypeSignature import OriginType, type_of
 from ..HMTypeSystem import ListType
 from collections import namedtuple
 
 
 class TypeClassMeta(type):
+
     def __init__(cls, *args):
         super(TypeClassMeta, cls).__init__(*args)
         cls.__instances__ = {}
@@ -26,6 +27,7 @@ class TypeClassMeta(type):
 
 class TypeClass(object):
     __metaclass__ = TypeClassMeta
+    __slots__ = '__instances__'
 
     @classmethod
     def make_instance(cls, _type, **args):

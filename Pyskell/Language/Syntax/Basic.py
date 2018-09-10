@@ -106,11 +106,8 @@ class Constraints(Syntax):
     def __getitem__(self, item):
         return Constraints(item)
 
-    def __div__(self, other):
-        return Signature((), self.constraints) >> other
-
     def __truediv__(self, other):
-        return self.__div__(other)
+        return Signature((), self.constraints) >> other
 
 
 C = Constraints()
