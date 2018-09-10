@@ -60,7 +60,6 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     if isinstance(argument, str) and argument.islower():
         if argument not in type_var_dict:
             if argument in constraints:
-                # TODO: Check `constraints` type is tuple or something
                 type_var_dict[argument] = \
                     TypeVariable(constraints=constraints[argument])
             else:
