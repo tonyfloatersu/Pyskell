@@ -2,11 +2,6 @@ from ..PyskellTypeSystem import *
 from inspect import isclass
 from collections import defaultdict
 
-
-def ct(obj):
-    return str(type_of(obj))
-
-
 __magic_methods__ = ["__{}__".format(s) for s in {
     "len", "getitem", "setitem", "delitem", "iter", "reversed", "contains",
     "missing", "delattr", "call", "enter", "exit", "eq", "ne", "gt", "lt",
@@ -139,3 +134,17 @@ def typify_py_func(fn, high=None):
     if high is not None:
         type_name_list[-1] = high(type_name_list[-1])
     return TS(Signature(type_name_list, []))
+
+
+def _t(func):
+    def recursively_trans(tp):
+        tp = prune(tp)
+        if isinstance(tp, TypeOperator) and tp.name == "->":
+            return Arrow(recursively_trans(tp.types[0]),
+                         recursively_trans(tp.types[1]))
+        else:
+            return tp
+    if not isinstance(func, TypedFunction):
+        raise TypeError
+    print(str(recursively_trans(type_of(func))))
+    return str(recursively_trans(type_of(func)))
