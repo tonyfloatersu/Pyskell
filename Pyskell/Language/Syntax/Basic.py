@@ -137,15 +137,14 @@ def typify_py_func(fn, high=None):
 
 
 def _t(func):
-    def recurs_trans_arrow(tp):
+    def recursively_trans(tp):
         tp = prune(tp)
         if isinstance(tp, TypeOperator) and tp.name == "->":
-            return Arrow(recurs_trans_arrow(tp.types[0]),
-                         recurs_trans_arrow(tp.types[1]))
+            return Arrow(recursively_trans(tp.types[0]),
+                         recursively_trans(tp.types[1]))
         else:
             return tp
     if not isinstance(func, TypedFunction):
         raise TypeError
-    trans_res = recurs_trans_arrow(type_of(func))
-    print(str(trans_res))
-    return str(trans_res)
+    print(str(recursively_trans(type_of(func))))
+    return str(recursively_trans(type_of(func)))
