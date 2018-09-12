@@ -43,7 +43,7 @@ class TypedFunction(OriginType):
                                   )
             new_fn_type = analyze(compose_type, eval_env)
             new_fn_arg = [other.fn_args[0]] + self.fn_args[1:]
-            return TypedFunction(lambda x: self.fn(other.fn(x)),
+            return TypedFunction(lambda x: self.fn(other(x)),
                                  new_fn_arg, new_fn_type)
 
     def __mod__(self, other):
