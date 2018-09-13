@@ -1,4 +1,4 @@
-from .AlgebraicDataType import ADT
+from Pyskell.Language.AlgebraicDataType import ADT
 
 
 def nt_to_tuple(nt):

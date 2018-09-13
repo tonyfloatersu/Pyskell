@@ -1,7 +1,6 @@
-from Pyskell.Language.PyskellTypeSystem.AlgebraicDataType import *
+from Pyskell.Language.AlgebraicDataType import *
 from Pyskell.Language.Syntax import Syntax
-from Pyskell.Language.TypeClasses import *
-from Pyskell.Language.PyskellTypeSystem.TypeClass import *
+from Pyskell.Language.TypeClass import *
 
 
 """
