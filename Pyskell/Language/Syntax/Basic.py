@@ -1,6 +1,6 @@
 from ..TypedFunc.TypeSignature import *
 from ..TypedFunc.TypedFunction import TypedFunction
-from ..TypeClass import *
+from ..TypeClass.TypeClass import *
 from inspect import isclass
 from collections import defaultdict
 
@@ -139,15 +139,30 @@ def typify_py_func(fn, high=None):
 
 
 def _t(func):
-    def recurs_trans_arrow(tp):
-        tp = prune(tp)
-        if isinstance(tp, TypeOperator) and tp.name == "->":
-            return Arrow(recurs_trans_arrow(tp.types[0]),
-                         recurs_trans_arrow(tp.types[1]))
-        else:
-            return tp
-    if not isinstance(func, TypedFunction):
-        raise TypeError
-    trans_res = recurs_trans_arrow(type_of(func))
-    print(str(trans_res))
-    return trans_res
+    temp_res = fresh(type_of(func), {})
+
+    def recursive_checker(some_fn):
+        map_to = set()
+
+        def reg(tp):
+            if isinstance(tp, TypeVariable):
+                for _i in tp.constraints:
+                    map_to.add((_i, tp))
+            elif isinstance(tp, TypeOperator):
+                for _i in tp.types:
+                    reg(_i)
+
+        reg(some_fn)
+        return map_to
+
+    if isinstance(type_of(func), Arrow):
+        cons = recursive_checker(temp_res)
+        if len(cons) > 0:
+            base = ", ".join(["{0} {1}".format(i[0].__name__, i[1].name)
+                              for i in cons])
+            if len(cons) > 1:
+                print("({})".format(base), end=' ')
+            else:
+                print(base, end=' ')
+            print("=> ", end='')
+    print(temp_res)
