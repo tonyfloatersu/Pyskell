@@ -1,6 +1,4 @@
-from .Expression import (Arrow, FuncApp, Lambda, Let,
-                         InferenceError, TypeVariable,
-                         TypeOperator, Variable)
+from .Expression import *
 
 
 def prune(tp):
@@ -82,10 +80,16 @@ def fresh(t, non_generic):
         if isinstance(p, TypeVariable):
             if is_generic(p, non_generic):
                 if p not in map_to:
-                    map_to[p] = TypeVariable()
+                    map_to[p] = TypeVariable(tuple(p.constraints))
                 return map_to[p]
             else:
                 return p
+        elif isinstance(p, Arrow):
+            return Arrow(fresh_closure(p.types[0]), fresh_closure(p.types[1]))
+        elif isinstance(p, ListType):
+            return ListType(fresh_closure(p.types[0]))
+        elif isinstance(p, TupleType):
+            return TupleType(tuple([fresh_closure(i) for i in p.types]))
         elif isinstance(p, TypeOperator):
             return TypeOperator(p.name, [fresh_closure(i) for i in p.types])
     return fresh_closure(t)
