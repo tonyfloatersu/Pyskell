@@ -1,7 +1,6 @@
-from .PyskellTypeSystem import TypeClass
-from .PyskellTypeSystem import is_builtin_type
-from .PyskellTypeSystem import add_instance
-from .PyskellTypeSystem import nt_to_tuple
+from .TypeClass import *
+from .TypedFunc.TypeSignature import is_builtin_type
+from .PatternMatching import nt_to_tuple
 
 from .Syntax.Basic import TS
 from .Syntax.Basic import C

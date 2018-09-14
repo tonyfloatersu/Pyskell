@@ -7,8 +7,8 @@ from ..HMTypeSystem import *
 import types
 
 __python_builtins__ = {
-    type, bool, dict, float, int, str, tuple, type(None), type(Ellipsis),
-    types.BuiltinFunctionType, types.BuiltinMethodType,
+    type, bool, dict, float, int, str, tuple, complex, type(None), list, set,
+    type(Ellipsis), types.BuiltinFunctionType, types.BuiltinMethodType,
     types.CodeType, types.DynamicClassAttribute, types.FrameType,
     types.FunctionType, types.GeneratorType, types.GetSetDescriptorType,
     types.LambdaType, types.MappingProxyType, types.MemberDescriptorType,

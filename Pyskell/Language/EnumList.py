@@ -1,11 +1,10 @@
 import itertools
 import collections
-from HMTypeSystem import *
-from PyskellTypeSystem import *
-from TypeClasses import *
-from Syntax import C, TS
-from Syntax import Instance
-from Syntax import Syntax
+from .HMTypeSystem import *
+from .TypeClasses import *
+from .Syntax import C, TS
+from .Syntax import Instance
+from .Syntax import Syntax
 
 
 class Enum(TypeClass):

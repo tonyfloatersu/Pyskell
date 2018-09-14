@@ -11,7 +11,8 @@ from .Neutralizer import replace_magic_methods
 
 class ADT(OriginType):
 
-    __slots__ = '__type_constructor__'
+    __slots__ = ['__type_constructor__', '__parameters__',
+                 '__constructors__', '__ADT__slot__order__']
 
 
 def generate_type_constructor(name, type_args):
@@ -30,6 +31,9 @@ def generate_type_constructor(name, type_args):
         Inherit from `ADT` type.
         With `__type__` defined as TypeOperator of self
         and type arguments as TypeVariables
+
+    Note: The magic method are replaced so that its instance cannot be used
+          in compare or ... Unless defined
     """
     def raise_fn(rua):
         raise rua()
@@ -60,8 +64,7 @@ def generate_data_constructor(data_con_name, fields,
         master_type_constructor {ADT type}:
         master adt type for this data constructor
 
-        slot_order_in_adt {int}:
-        this data constructor's order in adt.
+        slot_order_in_adt {int}: this data constructor's order in adt.
         In Maybe, Just = 0, Nothing = 1
 
     Returns:
