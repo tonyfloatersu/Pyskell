@@ -1,4 +1,6 @@
-from ..PyskellTypeSystem import *
+from ..TypedFunc.TypeSignature import *
+from ..TypedFunc.TypedFunction import TypedFunction
+from ..TypeClass import *
 from inspect import isclass
 from collections import defaultdict
 

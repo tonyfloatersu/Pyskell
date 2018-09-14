@@ -123,15 +123,6 @@ def build_adt(typename, type_args, data_constructors, to_derive):
         The type constructor with data cons
     """
 
-    """
-    new_type = new_class(name, (ADT,), kwds={'__parameters__': tuple(type_args),
-                                             '__constructors__': ()})
-    new_type = type(name, (ADT,),
-                    {'__parameters__': tuple(type_args),
-                     '__constructors__': ()})
-    new_type.__type__ = lambda: TypeOperator(new_type, [TypeVariable()
-                                                        for _ in type_args])
-    """
     adt_type = generate_type_constructor(typename, type_args)
     # adt_type = generate_type_constructor(typename, type_args)
     data_cons = [generate_data_constructor(dc_name, dc_field, adt_type, i)
