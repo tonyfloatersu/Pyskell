@@ -155,14 +155,10 @@ def _t(func):
         reg(some_fn)
         return map_to
 
-    if isinstance(type_of(func), Arrow):
+    if isinstance(temp_res, Arrow):
         cons = recursive_checker(temp_res)
         if len(cons) > 0:
             base = ", ".join(["{0} {1}".format(i[0].__name__, i[1].name)
                               for i in cons])
-            if len(cons) > 1:
-                print("({})".format(base), end=' ')
-            else:
-                print(base, end=' ')
-            print("=> ", end='')
+            print("({})".format(base) if len(cons) > 1 else base, end=' => ')
     print(temp_res)

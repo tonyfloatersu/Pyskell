@@ -92,6 +92,8 @@ def fresh(t, non_generic):
             return TupleType(tuple([fresh_closure(i) for i in p.types]))
         elif isinstance(p, TypeOperator):
             return TypeOperator(p.name, [fresh_closure(i) for i in p.types])
+        else:
+            return p
     return fresh_closure(t)
 
 
