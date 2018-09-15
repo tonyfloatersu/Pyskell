@@ -242,11 +242,6 @@ Instance(Enum, int).where(fromEnum=int, toEnum=int)
 Instance(Enum, str).where(fromEnum=ord, toEnum=chr)
 
 
-@TS(C[(Enum, "a")] / "a" >> "a")
-def pred(a):
-    return Enum[a].pred(a)
-
-
 @TS(C[(Enum, "a")] / "a" >> "a" >> ["a"])
 def enumFromThen(srt, snd):
     return L[Enum[srt].enumFromThen(srt, snd)]

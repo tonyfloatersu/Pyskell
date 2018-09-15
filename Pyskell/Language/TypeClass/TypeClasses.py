@@ -2,6 +2,7 @@ from ..TypedFunc.TypeSignature import is_builtin_type
 from ..PatternMatching import nt_to_tuple
 from ..Syntax.Basic import TS, C, Instance
 from .TypeClass import *
+from ..TypedFunc.TypedFunction import TypedFunction
 import operator
 
 
@@ -11,11 +12,17 @@ class Show(TypeClass):
         if "show" not in kwargs:
             raise KeyError("No show entry")
         _show = kwargs["show"]
-        __show__ = _show ** (C / "a" >> str)
-        add_instance(Show, _type, {"show": lambda x: __show__(x)})
-        if not is_builtin_type(_type):
-            _type.__repr__ = _show
-            _type.__str__ = _show
+        if not isinstance(_show, TypedFunction):
+            __show__ = _show ** (C / "a" >> str)
+            add_instance(Show, _type, {"show": lambda x: __show__(x)})
+            if not is_builtin_type(_type):
+                _type.__repr__ = _show
+                _type.__str__ = _show
+        else:
+            add_instance(Show, _type, {"show": lambda x: _show(x)})
+            if not is_builtin_type(_type):
+                _type.__repr__ = lambda x: _show % x
+                _type.__str__ = lambda x: _show % x
 
     @classmethod
     def derive_instance(cls, _type):
