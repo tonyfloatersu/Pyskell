@@ -14,7 +14,4 @@
 
 ## TODOs
 
-- Move all the `showoff.py` functions into test section.
 - Add `Data` section modules.
-- [X] Update to Python3 version.
-- [ ] Check Typed Function constraints type
