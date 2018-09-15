@@ -1,6 +1,6 @@
-from .AlgebraicDataType import ADT
-from .TypedFunc.TypeSignature import OriginType, type_of
-from Pyskell.Language.HMTypeSystem import ListType
+from ..AlgebraicDataType import ADT
+from ..TypedFunc.TypeSignature import OriginType, type_of
+from ..HMTypeSystem import ListType
 from collections import namedtuple
 
 
@@ -9,25 +9,24 @@ class TypeClassMeta(type):
     def __init__(cls, *args):
         super(TypeClassMeta, cls).__init__(*args)
         cls.__instances__ = {}
+        # remove self, (... stay ...), remove TypeClass, remove object
         cls.__dependencies__ = cls.mro()[1: -2]
 
-    def __getitem__(self, item):
+    def __getitem__(cls, item):
         try:
             if isinstance(item, ADT):
-                return self.__instances__[id(item.__type_constructor__)]
+                return cls.__instances__[id(item.__type_constructor__)]
             elif isinstance(type_of(item), ListType):
-                return self.__instances__[id(type(item))]
+                return cls.__instances__[id(type(item))]
             elif isinstance(item, OriginType):
-                return self.__instances__[id(type_of(item))]
+                return cls.__instances__[id(type_of(item))]
             else:
-                return self.__instances__[id(type(item))]
+                return cls.__instances__[id(type(item))]
         except KeyError:
             raise TypeError("No instance for {}".format(item))
 
 
-class TypeClass(object):
-    __metaclass__ = TypeClassMeta
-    __slots__ = '__instances__', '__dependencies__'
+class TypeClass(object, metaclass=TypeClassMeta):
 
     @classmethod
     def make_instance(cls, _type, **args):

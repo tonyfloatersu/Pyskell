@@ -1,11 +1,7 @@
-from .PyskellTypeSystem import TypeClass
-from .PyskellTypeSystem import is_builtin_type
-from .PyskellTypeSystem import add_instance
-from .PyskellTypeSystem import nt_to_tuple
-
-from .Syntax.Basic import TS
-from .Syntax.Basic import C
-from .Syntax.Basic import Instance
+from ..TypedFunc.TypeSignature import is_builtin_type
+from ..PatternMatching import nt_to_tuple
+from ..Syntax.Basic import TS, C, Instance
+from .TypeClass import *
 import operator
 
 
@@ -18,8 +14,8 @@ class Show(TypeClass):
         __show__ = _show ** (C / "a" >> str)
         add_instance(Show, _type, {"show": lambda x: __show__(x)})
         if not is_builtin_type(_type):
-            _type.__repr__ = show
-            _type.__str__ = show
+            _type.__repr__ = _show
+            _type.__str__ = _show
 
     @classmethod
     def derive_instance(cls, _type):
@@ -37,7 +33,7 @@ class Show(TypeClass):
         Show.make_instance(_type, show=local_show)
 
 
-@TS(C / "a" >> str)
+@TS(C[(Show, "a")] / "a" >> str)
 def show(o):
     return Show[o].show(o)
 

@@ -1,23 +1,9 @@
-from ..PyskellTypeSystem import *
+from ..TypedFunc.TypeSignature import *
+from ..TypedFunc.TypedFunction import TypedFunction
+from ..TypeClass.TypeClass import *
 from inspect import isclass
 from collections import defaultdict
-
-__magic_methods__ = ["__{}__".format(s) for s in {
-    "len", "getitem", "setitem", "delitem", "iter", "reversed", "contains",
-    "missing", "delattr", "call", "enter", "exit", "eq", "ne", "gt", "lt",
-    "ge", "le", "pos", "neg", "abs", "invert", "round", "floor", "ceil",
-    "trunc", "add", "sub", "mul", "div", "truediv", "floordiv", "mod",
-    "divmod", "pow", "lshift", "rshift", "or", "and", "xor", "radd", "rsub",
-    "rmul", "rdiv", "rtruediv", "rfloordiv", "rmod", "rdivmod", "rpow",
-    "rlshift", "rrshift", "ror", "rand", "rxor", "isub", "imul", "ifloordiv",
-    "idiv", "imod", "idivmod", "irpow", "ilshift", "irshift", "ior", "iand",
-    "ixor", "nonzero"}]
-
-
-def replace_magic_methods(some_class, fn):
-    for attr in __magic_methods__:
-        setattr(some_class, attr, fn)
-    return
+from ..Neutralizer import *
 
 
 class Syntax(object):
@@ -137,15 +123,26 @@ def typify_py_func(fn, high=None):
 
 
 def _t(func):
-    def recurs_trans_arrow(tp):
-        tp = prune(tp)
-        if isinstance(tp, TypeOperator) and tp.name == "->":
-            return Arrow(recurs_trans_arrow(tp.types[0]),
-                         recurs_trans_arrow(tp.types[1]))
-        else:
-            return tp
-    if not isinstance(func, TypedFunction):
-        raise TypeError
-    trans_res = recurs_trans_arrow(type_of(func))
-    print(str(trans_res))
-    return trans_res
+    temp_res = fresh(type_of(func), {})
+
+    def recursive_checker(some_fn):
+        map_to = set()
+
+        def reg(tp):
+            if isinstance(tp, TypeVariable):
+                for _i in tp.constraints:
+                    map_to.add((_i, tp))
+            elif isinstance(tp, TypeOperator):
+                for _i in tp.types:
+                    reg(_i)
+
+        reg(some_fn)
+        return map_to
+
+    if isinstance(temp_res, Arrow):
+        cons = recursive_checker(temp_res)
+        if len(cons) > 0:
+            base = ", ".join(["{0} {1}".format(i[0].__name__, i[1].name)
+                              for i in cons])
+            print("({})".format(base) if len(cons) > 1 else base, end=' => ')
+    print(temp_res)
