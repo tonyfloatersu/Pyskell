@@ -3,7 +3,6 @@ import collections
 from ..HMTypeSystem import *
 from ..TypeClass.TypeClasses import *
 from ..Syntax import C, TS, Instance, Syntax
-from functools import total_ordering
 
 
 class Enum(TypeClass):
@@ -84,7 +83,6 @@ def pred(a):
     return Enum[a].pred(a)
 
 
-@total_ordering
 class HaskellList(OriginType, collections.Sequence):
     def __init__(self, head=None, tail=None):
         self.__head = []
@@ -183,16 +181,28 @@ class HaskellList(OriginType, collections.Sequence):
                 return True
         return False
 
+    def __add__(self, other):
+        unify_type(self.__type__(), type_of(other))
+        if self.__is_fully_evaluated and other.__is_fully_evaluated:
+            return HaskellList(head=self.__head + other.__head)
+        elif self.__is_fully_evaluated and not other.__is_fully_evaluated:
+            return HaskellList(head=self.__head + other.__head,
+                               tail=other.__tail)
+        else:
+            return HaskellList(head=self.__head,
+                               tail=itertools.chain(self.__tail,
+                                                    iter(other)))
+
     def __cmp__(self, other):
         def cmp(a, b):
             return (a > b) - (a < b)
 
         if not isinstance(other, HaskellList):
-            raise TypeError("{} is not Haskell List".format(other))
+            return 114514
         if self.__is_fully_evaluated and other.__is_fully_evaluated:
             return cmp(self.__head, other.__head)
         elif len(self.__head) >= len(other.__head):
-            exist_comp_res = map(lambda x, y: cmp(x, y),
+            exist_comp_res = map(lambda t: cmp(t[0], t[1]),
                                  zip(self.__head[:len(other.__head)],
                                      other.__head))
             for i in exist_comp_res:
@@ -228,8 +238,17 @@ class HaskellList(OriginType, collections.Sequence):
     def __eq__(self, other):
         return self.__cmp__(other) == 0
 
-    def __lt__(self, other):
+    def __le__(self, other):
         return self.__cmp__(other) == -1
+
+    def __lt__(self, other):
+        return self.__cmp__(other) in (0, -1)
+
+    def __ge__(self, other):
+        return self.__cmp__(other) == 1
+
+    def __gt__(self, other):
+        return self.__cmp__(other) in (0, 1)
 
 
 Instance(Show, HaskellList).where(show=HaskellList.__str__)
@@ -240,11 +259,6 @@ Instance(Ord, HaskellList).where(lt=HaskellList.__lt__,
                                  ge=HaskellList.__ge__)
 Instance(Enum, int).where(fromEnum=int, toEnum=int)
 Instance(Enum, str).where(fromEnum=ord, toEnum=chr)
-
-
-@TS(C[(Enum, "a")] / "a" >> "a")
-def pred(a):
-    return Enum[a].pred(a)
 
 
 @TS(C[(Enum, "a")] / "a" >> "a" >> ["a"])
@@ -269,19 +283,34 @@ def enumFromTo(srt, end):
 
 class GenerateHL(Syntax):
     def __getitem__(self, item):
-        if isinstance(item, tuple) and len(item) <= 4 and Ellipsis in item:
-            if len(item) == 2 and item[1] == Ellipsis:
-                return enumFrom(item[0])
-            elif len(item) == 3 and item[2] == Ellipsis:
-                return enumFromThen(item[0], item[1])
-            elif len(item) == 3 and item[1] == Ellipsis:
-                return enumFromTo(item[0], item[2])
-            elif len(item) == 4 and item[2] == Ellipsis:
-                return enumFromThenTo(item[0], item[1], item[3])
-            raise SyntaxError("Error in HL Constructor")
+        if isinstance(item, tuple):
+            if len(item) <= 4 and Ellipsis in item:
+                if len(item) == 2 and item[1] == Ellipsis:
+                    return enumFrom % item[0]
+                elif len(item) == 3 and item[2] == Ellipsis:
+                    return enumFromThen % item[0] % item[1]
+                elif len(item) == 3 and item[1] == Ellipsis:
+                    return enumFromTo % item[0] % item[2]
+                elif len(item) == 4 and item[2] == Ellipsis:
+                    return enumFromThenTo % item[0] % item[1] % item[3]
+                raise SyntaxError("Error in HL Constructor")
+            else:
+                return HaskellList(head=list(item))
         elif hasattr(item, "next") or hasattr(item, "__next__"):
             return HaskellList(tail=item)
-        return HaskellList(head=item)
+        elif isinstance(item, list) or isinstance(item, tuple):
+            return HaskellList(head=[]) if len(item) == 0 \
+                else HaskellList(head=item)
+        else:
+            return HaskellList(head=[item])
+
+    def __call__(self, item):
+        if hasattr(item, "next") or hasattr(item, "__next__") \
+                or hasattr(item, "start"):
+            return HaskellList(tail=item)
+        elif isinstance(item, HaskellList):
+            return HaskellList(tail=item)
+        raise TypeError(self.invalid_syntax)
 
 
 L = GenerateHL("HL Constructor Error")
