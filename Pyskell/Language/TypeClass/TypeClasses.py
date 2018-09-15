@@ -1,10 +1,7 @@
+from ..TypedFunc.TypeSignature import is_builtin_type
+from ..PatternMatching import nt_to_tuple
+from ..Syntax.Basic import TS, C, Instance
 from .TypeClass import *
-from .TypedFunc.TypeSignature import is_builtin_type
-from .PatternMatching import nt_to_tuple
-
-from .Syntax.Basic import TS
-from .Syntax.Basic import C
-from .Syntax.Basic import Instance
 import operator
 
 
@@ -36,7 +33,7 @@ class Show(TypeClass):
         Show.make_instance(_type, show=local_show)
 
 
-@TS(C / "a" >> str)
+@TS(C[(Show, "a")] / "a" >> str)
 def show(o):
     return Show[o].show(o)
 

@@ -1,6 +1,6 @@
 from collections import deque
 from .Basic import *
-from Pyskell.Language.TypeClasses import show
+from Pyskell.Language.TypeClass.TypeClasses import show
 
 
 class MatchStackFrame(object):

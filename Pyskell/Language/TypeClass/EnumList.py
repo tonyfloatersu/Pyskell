@@ -1,10 +1,9 @@
 import itertools
 import collections
-from .HMTypeSystem import *
-from .TypeClasses import *
-from .Syntax import C, TS
-from .Syntax import Instance
-from .Syntax import Syntax
+from ..HMTypeSystem import *
+from ..TypeClass.TypeClasses import *
+from ..Syntax import C, TS, Instance, Syntax
+from functools import total_ordering
 
 
 class Enum(TypeClass):
@@ -70,21 +69,22 @@ class Enum(TypeClass):
                            toEnum=lambda x: _type.__constructors__[x])
 
 
-@TS(C / "a" >> int)
+@TS(C[(Enum, "a")] / "a" >> int)
 def fromEnum(a):
     return Enum[a].fromEnum(a)
 
 
-@TS(C / "a" >> "a")
+@TS(C[(Enum, "a")] / "a" >> "a")
 def succ(a):
     return Enum[a].succ(a)
 
 
-@TS(C / "a" >> "a")
+@TS(C[Enum, "a"] / "a" >> "a")
 def pred(a):
     return Enum[a].pred(a)
 
 
+@total_ordering
 class HaskellList(OriginType, collections.Sequence):
     def __init__(self, head=None, tail=None):
         self.__head = []
@@ -139,7 +139,7 @@ class HaskellList(OriginType, collections.Sequence):
         if len(self.__head) == 0 and self.__is_fully_evaluated:
             return "L[[]]"
         elif len(self.__head) == 1 and self.__is_fully_evaluated:
-            return "L[[{}]]".format(show(self.__head[0]))
+            return "L[{}]".format(show(self.__head[0]))
         line = ", ".join(show(i) for i in self.__head)
         return "L[{}]".format(line) if self.__is_fully_evaluated\
             else "L[{} ...]".format(line)
@@ -184,12 +184,15 @@ class HaskellList(OriginType, collections.Sequence):
         return False
 
     def __cmp__(self, other):
+        def cmp(a, b):
+            return (a > b) - (a < b)
+
         if not isinstance(other, HaskellList):
             raise TypeError("{} is not Haskell List".format(other))
         if self.__is_fully_evaluated and other.__is_fully_evaluated:
             return cmp(self.__head, other.__head)
         elif len(self.__head) >= len(other.__head):
-            exist_comp_res = map(lambda (x, y): cmp(x, y),
+            exist_comp_res = map(lambda x, y: cmp(x, y),
                                  zip(self.__head[:len(other.__head)],
                                      other.__head))
             for i in exist_comp_res:
@@ -223,19 +226,10 @@ class HaskellList(OriginType, collections.Sequence):
         return 0
 
     def __eq__(self, other):
-        return cmp(self, other) == 0
-
-    def __le__(self, other):
-        return cmp(self, other) in (0, -1)
+        return self.__cmp__(other) == 0
 
     def __lt__(self, other):
-        return cmp(self, other) == -1
-
-    def __gt__(self, other):
-        return cmp(self, other) == 1
-
-    def __ge__(self, other):
-        return cmp(self, other) in (1, 0)
+        return self.__cmp__(other) == -1
 
 
 Instance(Show, HaskellList).where(show=HaskellList.__str__)
@@ -245,30 +239,30 @@ Instance(Ord, HaskellList).where(lt=HaskellList.__lt__,
                                  le=HaskellList.__le__,
                                  ge=HaskellList.__ge__)
 Instance(Enum, int).where(fromEnum=int, toEnum=int)
-Instance(Enum, float).where(fromEnum=int, toEnum=float)
+Instance(Enum, str).where(fromEnum=ord, toEnum=chr)
 
 
-@TS(C / "a" >> "a")
+@TS(C[(Enum, "a")] / "a" >> "a")
 def pred(a):
     return Enum[a].pred(a)
 
 
-@TS(C / "a" >> "a" >> ["a"])
+@TS(C[(Enum, "a")] / "a" >> "a" >> ["a"])
 def enumFromThen(srt, snd):
     return L[Enum[srt].enumFromThen(srt, snd)]
 
 
-@TS(C / "a" >> ["a"])
+@TS(C[(Enum, "a")] / "a" >> ["a"])
 def enumFrom(srt):
     return L[Enum[srt].enumFrom(srt)]
 
 
-@TS(C / "a" >> "a" >> "a" >> ["a"])
+@TS(C[(Enum, "a")] / "a" >> "a" >> "a" >> ["a"])
 def enumFromThenTo(srt, snd, end):
     return L[Enum[srt].enumFromThenTo(srt, snd, end)]
 
 
-@TS(C / "a" >> "a" >> ["a"])
+@TS(C[(Enum, "a")] / "a" >> "a" >> ["a"])
 def enumFromTo(srt, end):
     return L[Enum[srt].enumFromTo(srt, end)]
 
