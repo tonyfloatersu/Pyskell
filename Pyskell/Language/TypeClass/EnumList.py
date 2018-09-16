@@ -115,6 +115,7 @@ class HaskellList(OriginType, collections.Sequence):
             self.__next()
 
     def __type__(self):
+        # ENHANCE: What should it return if L[L[[]], L[1]], should be [[int]]
         if self.__is_fully_evaluated:
             if len(self.__head) == 0:
                 return ListType(TypeVariable())
@@ -308,7 +309,7 @@ class GenerateHL(Syntax):
             return HaskellList(tail=item)
         elif isinstance(item, list) or isinstance(item, tuple):
             return HaskellList(head=[]) if len(item) == 0 \
-                else HaskellList(head=item)
+                else HaskellList(head=list(item))
         else:
             return HaskellList(head=[item])
 

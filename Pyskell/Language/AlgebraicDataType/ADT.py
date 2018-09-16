@@ -3,10 +3,10 @@ If there's ADT, then we might fly on the sky of types
 We can carefully, and easily create a lot of types
 """
 
-from .TypedFunc.TypeSignature import *
-from .TypedFunc.TypedFunction import TypedFunction
+from Pyskell.Language.TypedFunc.TypeSignature import *
+from Pyskell.Language.TypedFunc.TypedFunction import TypedFunction
 from collections import namedtuple
-from .Neutralizer import replace_magic_methods
+from Pyskell.Language.Neutralizer import replace_magic_methods
 
 
 class ADT(OriginType):

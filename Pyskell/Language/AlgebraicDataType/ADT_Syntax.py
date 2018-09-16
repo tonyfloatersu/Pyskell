@@ -1,6 +1,6 @@
-from Pyskell.Language.AlgebraicDataType import *
-from Pyskell.Language.Syntax import Syntax
-from Pyskell.Language.TypeClass import *
+from .ADT import *
+from ..Syntax import Syntax
+from ..TypeClass.TypeClass import TypeClass
 
 
 """
