@@ -125,6 +125,14 @@ class HaskellList(OriginType, collections.Sequence):
             return self.__type__()
         return ListType(type_of(self.__head[0]))
 
+    def __xor__(self, other):
+        unify_type(ListType(self.__type__()), type_of(other))
+        if other.__is_fully_evaluated:
+            return HaskellList(head=[self] + other.__head)
+        else:
+            return HaskellList(head=[self] + other.__head,
+                               tail=other.__tail)
+
     def __rxor__(self, other):
         unify_type(self.__type__(), ListType(type_of(other)))
         if self.__is_fully_evaluated:
