@@ -1,151 +1,109 @@
 from .ADT import *
 from ..Syntax import Syntax
-from ..TypeClass.TypeClass import TypeClass
+from ..TypeClass.TypeClass import TypeClassMeta
+from ..Syntax.Basic import Signature
+from inspect import isclass
 
 
 """
 I want the ADT with the syntax of:
-data.(...) >> d.Expr_0
-            | d.Expr_1
-            .
-            .
-            | d.Expr_n
-(optional)  & deriving(...)
+@AlgebraDT(deriving=[...])
+class SomeADT(...)
+    Entry0: gT / t0 >> t1 >> td("SomeADT", ...)
+    Entry1: gT / td("someADT", ...)
+    Entry2: gT / t1 >> td("someADT", ...) >> td("someADT", ...)
+    ...
+
+How to get the entries... Still considering
+
+Example:
+
+@AlgebraDT(deriving=(Show, Eq))
+class Tester(HigherKT("a", "b")):
+    A_Entry: gT / int >> "a" >> "b"
+    B_Entry: gT / str
+    C_Entry: gT / td("Tester", "a", "b")
 """
 
 
-class DerivingTypeClasses(Syntax):
-    def __init__(self, *type_classes):
-        super(DerivingTypeClasses, self).__init__("Syntax Error in deriving")
-        for t in type_classes:
-            if not issubclass(t, TypeClass):
-                raise TypeError("Non type-class error {}".format(t))
-        self.type_classes = type_classes
+class HigherKT(Syntax):
 
-
-deriving = DerivingTypeClasses
-
-
-class SyntaxDataConstructor(Syntax):
-    """
-    Basic Syntax Data Constructor containing `d.DataCon(...)` info
-    """
-    def __init__(self, data_con_name, args=(), t_classes=()):
-        super(SyntaxDataConstructor, self).__init__("Syntax Error in DataCon")
-        self.name = data_con_name
+    def __init__(self, *args):
+        super(HigherKT, self).__init__("Syntax Error in Higher Kinded Type")
         self.args = args
-        self.type_classes = t_classes
 
 
-class SyntaxCalcDataConstructor(SyntaxDataConstructor):
-    def __and__(self, other):
-        if not isinstance(other, DerivingTypeClasses):
-            raise self.invalid_syntax
-        return SyntaxDerivedDataConstructor(self.name, self.args,
-                                            other.type_classes)
+class ADTSigGen(Syntax):
 
-    def __or__(self, other):
-        if isinstance(other, SyntaxDataConstructor):
-            d_cons = ((self.name, self.args), (other.name, other.args))
-            if isinstance(other, SyntaxDerivedDataConstructor):
-                return SyntaxDerivedDataConstructors(d_cons,
-                                                     other.type_classes)
-            return SyntaxDataConstructors(d_cons)
-        raise self.invalid_syntax
-
-
-class SyntaxBuildDataConstructor(SyntaxCalcDataConstructor):
-    def __call__(self, *args):
-        return SyntaxCalcDataConstructor(self.name, args)
-
-
-class SyntaxDerivedDataConstructor(SyntaxDataConstructor):
-    """
-    This type is used to containing info for Data Constructor
-    After the situation of Derived
-    """
-    pass
-
-
-class SyntaxDerivedDataConstructors(Syntax):
-    def __init__(self, data_constructors, classes=()):
-        super(SyntaxDerivedDataConstructors, self)\
-            .__init__("Syntax Error in `d`")
-        self.data_constructors = data_constructors
-        self.type_classes = classes
-
-
-class SyntaxDataConstructors(SyntaxDerivedDataConstructors):
-    def __init__(self, data_constructors):
-        super(SyntaxDataConstructors, self).__init__(data_constructors)
-
-    def __or__(self, other):
-        if isinstance(other, SyntaxDataConstructor):
-            d_con = ((other.name, other.args), )
-            if isinstance(other, SyntaxDerivedDataConstructor):
-                return SyntaxDerivedDataConstructors(
-                    self.data_constructors + d_con,
-                    other.type_classes)
-            return SyntaxDataConstructors(self.data_constructors + d_con)
-        raise self.invalid_syntax
-
-
-class D(Syntax):
     def __init__(self):
-        super(D, self).__init__("Error in Data Constructor")
+        super(ADTSigGen, self).__init__("Syntax Error in Type Signature")
 
-    def __getattr__(self, item):
-        if not str(item[0]).isupper():
-            raise self.invalid_syntax
-        return SyntaxBuildDataConstructor(item)
+    def __truediv__(self, other):
+        return Signature((), []) >> other
 
 
-d = D()
+gT = ADTSigGen()
 
 
-class SyntaxTypeConstructor(Syntax):
-    def __init__(self, t_name, t_args=()):
-        super(SyntaxTypeConstructor, self).__init__("Error in TypeConstructor")
-        self.name = t_name
-        self.args = t_args
-
-    def __eq__(self, other):
-        if isinstance(other, SyntaxDataConstructor):
-            return build_adt(self.name, self.args,
-                             [(other.name, other.args)],
-                             other.type_classes)
-        elif isinstance(other, SyntaxDerivedDataConstructors):
-            return build_adt(self.name, self.args,
-                             other.data_constructors,
-                             other.type_classes)
-        raise self.invalid_syntax
+def td(type_constructor, *parameters):
+    if not isinstance(type_constructor, str):
+        if not isclass(type_constructor):
+            raise TypeError("Error in ADT Data Constructor, "
+                            "type constructor not str or class")
+        if not issubclass(type_constructor, ADT):
+            raise TypeError("Error in ADT Data Constructor, "
+                            "type constructor not str or class")
+        if len(type_constructor.__parameters__) != len(parameters):
+            raise TypeError("Incorrect number of type parameter {}"
+                            .format(type_constructor.__name__))
+    parameters = [i.signature if isinstance(i, Signature) else i
+                  for i in parameters]
+    return TypeSignatureHigherKind(type_constructor, parameters)
 
 
-class SyntaxCalledTypeConstructor(SyntaxTypeConstructor):
-    def __call__(self, *args):
-        if len(args) < 1:
-            raise SyntaxError("Should not be data.{}()".format(self.name))
-        if not all(type(arg) == str for arg in args):
-            raise SyntaxError("Type Parameters Should be str hkt")
-        if not all(arg.islower() for arg in args):
-            raise SyntaxError("Type Parameters Should be lowercase")
-        if len(args) != len(set(args)):
-            raise SyntaxError("Type Parameters Should be Unique")
-        return SyntaxHKTTypeConstructor(self.name, args)
+class AlgebraDT(Syntax):
+    def __init__(self, deriving=None):
+        super(AlgebraDT, self).__init__("Syntax Error in Algebra Syntax Type")
+        if deriving is not None:
+            for i in deriving:
+                if not isinstance(i, TypeClassMeta):
+                    raise TypeError(self.invalid_syntax)
 
+    def __call__(self, cls):
+        if not isinstance(cls, HigherKT):
+            raise TypeError(self.invalid_syntax)
+        name, obj_ls, cls_env = cls.args
+        if len(obj_ls) is not 1:
+            raise TypeError("Algebra dt must be inherited from HKT only")
+        type_args = list(obj_ls[0].args)
+        annotations = cls_env.get('__annotations__', {})
+        for key in annotations:
+            if key[0].islower():
+                raise SyntaxError("ADT Entry must not be lower case")
 
-class SyntaxHKTTypeConstructor(SyntaxTypeConstructor):
-    pass
+        # ================= TEST SECTION ==================== #
 
+        print(name)
+        print(type_args)
+        for key, val in annotations.items():
+            print("{} {}".format(key, val.signature.args))
 
-class Data(Syntax):
-    def __init__(self):
-        super(Data, self).__init__("Error in Type Constructor")
+        """
+        for obj in deriving:
+            if not isinstance(obj, TypeMeta):
+                raise TypeError('“%a” is not typeclass' % obj)
 
-    def __getattr__(self, item):
-        if not str(item[0]).isupper():
-            raise self.invalid_syntax
-        return SyntaxCalledTypeConstructor(item)
+        data_constructors = [(key, annotations[key]) for key in annotations]
 
+        t = build_ADT(typename=typename,
+                      typeargs=typeargs,
+                      data_constructors=data_constructors,
+                      to_derive=deriving)
+        res, *constructors = t
 
-data = Data()
+        for (constructor, value) in zip(annotations, constructors):
+            setattr(res, constructor, value)
+        setattr(res, 'enums', constructors)
+        setattr(res, '__doc__', env.get('__doc__', ''))
+        return res
+        """
