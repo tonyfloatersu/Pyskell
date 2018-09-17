@@ -23,6 +23,12 @@ class Tester(HigherKT("a", "b")):
     A_Entry: gT / int >> "a" >> "b"
     B_Entry: gT / str
     C_Entry: gT / td("Tester", "a", "b")
+
+@AlgebraDT(None)
+class BinT(HigherKT("a")):
+    Empty: gT / td("BinT", "a")
+    Leaf: gT / "a" >> td("BinT", "a")
+    Node: gT / td("BinT", "a") >> td("BinT", "a") >> td("BinT", "a")
 """
 
 
@@ -46,6 +52,7 @@ gT = ADTSigGen()
 
 
 def td(type_constructor, *parameters):
+
     if not isinstance(type_constructor, str):
         if not isclass(type_constructor):
             raise TypeError("Error in ADT Data Constructor, "
@@ -62,6 +69,7 @@ def td(type_constructor, *parameters):
 
 
 class AlgebraDT(Syntax):
+
     def __init__(self, deriving=None):
         super(AlgebraDT, self).__init__("Syntax Error in Algebra Syntax Type")
         if deriving is not None:
@@ -76,22 +84,37 @@ class AlgebraDT(Syntax):
         if len(obj_ls) is not 1:
             raise TypeError("Algebra dt must be inherited from HKT only")
         type_args = list(obj_ls[0].args)
+        for i in type_args:
+            if not i.islower():
+                raise TypeError("ADT type con only accept type variable")
         annotations = cls_env.get('__annotations__', {})
-        for key in annotations:
+        for key, key_sig in annotations.items():
             if key[0].islower():
                 raise SyntaxError("ADT Entry must not be lower case")
+            if not isinstance(key_sig.signature.args[-1],
+                              TypeSignatureHigherKind) or \
+                key_sig.signature.args[-1].constructor != name or \
+                    list(key_sig.signature.args[-1].parameters) \
+                    != list(type_args):
+                raise SyntaxError("ADT return res should be same as type con")
+            for i in key_sig.signature.args:
+                if isinstance(i, TypeSignatureHigherKind):
+                    if isinstance(i.constructor, str):
+                        if i.constructor != name:
+                            raise TypeError("self name call error")
+                        if len(i.parameters) != len(type_args):
+                            raise TypeError("Incorrect number of type parameter")
 
         # ================= TEST SECTION ==================== #
 
         print(name)
         print(type_args)
         for key, val in annotations.items():
-            print("{} {}".format(key, val.signature.args))
+            print("{} {}".format(key, [(i.constructor, i.parameters)
+                                       if isinstance(i, TypeSignatureHigherKind) else i
+                                       for i in val.signature.args]))
 
         """
-        for obj in deriving:
-            if not isinstance(obj, TypeMeta):
-                raise TypeError('“%a” is not typeclass' % obj)
 
         data_constructors = [(key, annotations[key]) for key in annotations]
 
