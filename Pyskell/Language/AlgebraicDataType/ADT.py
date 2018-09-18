@@ -72,6 +72,11 @@ def build_adt(typename, type_args, data_constructors, to_derive):
     """
 
     adt_type = generate_type_constructor(typename, type_args)
+    for key, val in data_constructors:
+        for i in val:
+            if isinstance(i, TypeSignatureHigherKind) and \
+                    isinstance(i.constructor, str):
+                i.constructor = adt_type
     data_cons = [generate_data_constructor(dc_name, dc_field, adt_type, i)
                  for i, (dc_name, dc_field) in enumerate(data_constructors)]
 

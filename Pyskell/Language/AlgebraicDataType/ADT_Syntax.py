@@ -76,6 +76,7 @@ class AlgebraDT(Syntax):
             for i in deriving:
                 if not isinstance(i, TypeClassMeta):
                     raise TypeError(self.invalid_syntax)
+        self.deriving = deriving if deriving is not None else []
 
     def __call__(self, cls):
         if not isinstance(cls, HigherKT):
@@ -106,30 +107,8 @@ class AlgebraDT(Syntax):
                             raise TypeError("self name call error")
                         if len(i.parameters) != len(type_args):
                             raise TypeError("Incorrect number: type parameter")
+        data_con_info = [(key, val.signature.args[0: -1])
+                         for key, val in annotations.items()]
 
-        # ================= TEST SECTION ==================== #
-
-        print(name)
-        print(type_args)
-        for key, val in annotations.items():
-            print("{} {}".format(key, [(i.constructor, i.parameters)
-                                       if isinstance(i, TypeSignatureHigherKind)
-                                       else i
-                                       for i in val.signature.args]))
-
-        """
-
-        data_constructors = [(key, annotations[key]) for key in annotations]
-
-        t = build_ADT(typename=typename,
-                      typeargs=typeargs,
-                      data_constructors=data_constructors,
-                      to_derive=deriving)
-        res, *constructors = t
-
-        for (constructor, value) in zip(annotations, constructors):
-            setattr(res, constructor, value)
-        setattr(res, 'enums', constructors)
-        setattr(res, '__doc__', env.get('__doc__', ''))
-        return res
-        """
+        m_all = build_adt(name, type_args, data_con_info, self.deriving)
+        return m_all
