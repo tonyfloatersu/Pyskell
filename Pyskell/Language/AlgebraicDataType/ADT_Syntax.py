@@ -84,6 +84,8 @@ class AlgebraDT(Syntax):
         if len(obj_ls) is not 1:
             raise TypeError("Algebra dt must be inherited from HKT only")
         type_args = list(obj_ls[0].args)
+        if len(type_args) != len(set(type_args)):
+            raise SyntaxError("ADT no type con arg dup")
         for i in type_args:
             if not i.islower():
                 raise TypeError("ADT type con only accept type variable")
@@ -103,7 +105,7 @@ class AlgebraDT(Syntax):
                         if i.constructor != name:
                             raise TypeError("self name call error")
                         if len(i.parameters) != len(type_args):
-                            raise TypeError("Incorrect number of type parameter")
+                            raise TypeError("Incorrect number: type parameter")
 
         # ================= TEST SECTION ==================== #
 
@@ -111,7 +113,8 @@ class AlgebraDT(Syntax):
         print(type_args)
         for key, val in annotations.items():
             print("{} {}".format(key, [(i.constructor, i.parameters)
-                                       if isinstance(i, TypeSignatureHigherKind) else i
+                                       if isinstance(i, TypeSignatureHigherKind)
+                                       else i
                                        for i in val.signature.args]))
 
         """
