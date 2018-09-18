@@ -1,4 +1,4 @@
-from ..AlgebraicDataType import ADT
+from ..AlgebraicDataType.ADT import ADT
 from ..TypedFunc.TypeSignature import OriginType, type_of
 from ..HMTypeSystem import ListType
 from collections import namedtuple

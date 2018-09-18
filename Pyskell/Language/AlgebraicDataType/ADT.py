@@ -1,40 +1,14 @@
-"""
-If there's ADT, then we might fly on the sky of types
-We can carefully, and easily create a lot of types
-"""
-
-from .TypedFunc.TypeSignature import *
-from .TypedFunc.TypedFunction import TypedFunction
+from ..TypedFunc.TypeSignature import *
+from ..TypedFunc.TypedFunction import TypedFunction
 from collections import namedtuple
-from .Neutralizer import replace_magic_methods
 
 
 class ADT(OriginType):
-
-    __slots__ = ['__type_constructor__', '__parameters__',
-                 '__constructors__', '__ADT__slot__order__']
+    pass
 
 
 def generate_type_constructor(name, type_args):
-    """
-    Generates the type_generator for algebraic data type
 
-    Example: data Maybe a = Just a
-                          | Nothing
-
-    Arguments:
-        name {str}: Type's name(str), eg: `Maybe`
-        type_args {[a]}: list of argument-types creating constructor
-
-    Returns:
-        A type with all magic undetermined.
-        Inherit from `ADT` type.
-        With `__type__` defined as TypeOperator of self
-        and type arguments as TypeVariables
-
-    Note: The magic method are replaced so that its instance cannot be used
-          in compare or ... Unless defined
-    """
     def raise_fn(rua):
         raise rua()
 
@@ -43,7 +17,20 @@ def generate_type_constructor(name, type_args):
                      '__constructors__': ()})
     new_type.__type__ = lambda s: TypeOperator(new_type, [TypeVariable()
                                                           for _ in type_args])
-    replace_magic_methods(new_type, lambda s, *o: raise_fn(TypeError))
+    new_type.__iter__ = lambda self: raise_fn(TypeError)
+    new_type.__contains__ = lambda self, other: raise_fn(TypeError)
+    new_type.__add__ = lambda self, other: raise_fn(TypeError)
+    new_type.__radd__ = lambda self, other: raise_fn(TypeError)
+    new_type.__rmul__ = lambda self, other: raise_fn(TypeError)
+    new_type.__mul__ = lambda self, other: raise_fn(TypeError)
+    new_type.__lt__ = lambda self, other: raise_fn(TypeError)
+    new_type.__gt__ = lambda self, other: raise_fn(TypeError)
+    new_type.__le__ = lambda self, other: raise_fn(TypeError)
+    new_type.__ge__ = lambda self, other: raise_fn(TypeError)
+    new_type.__eq__ = lambda self, other: raise_fn(TypeError)
+    new_type.__ne__ = lambda self, other: raise_fn(TypeError)
+    new_type.count = lambda self, other: raise_fn(TypeError)
+    new_type.index = lambda self, other: raise_fn(TypeError)
     new_type.__repr__ = object.__repr__
     new_type.__str__ = object.__str__
     return new_type
@@ -52,37 +39,6 @@ def generate_type_constructor(name, type_args):
 def generate_data_constructor(data_con_name, fields,
                               master_type_constructor,
                               slot_order_in_adt):
-    """
-    Generates a data_constructor for ADT
-
-    Arguments:
-
-        data_con_name {str}: data constructor name, eg: `Just`
-
-        fields {[types]}: types after type constructor, eg: Just a
-
-        master_type_constructor {ADT type}:
-        master adt type for this data constructor
-
-        slot_order_in_adt {int}: this data constructor's order in adt.
-        In Maybe, Just = 0, Nothing = 1
-
-    Returns:
-        A data constructor, containing:
-        __type_constructor__ as type-constructor
-        __ADT__slot__order__ as order in ADT
-        inherit from:
-        - some master adt type constructor
-        - namedtuple for data constructor with
-          data constructor name
-        if the field is not empty, change:
-            __type__ from type constructor
-            by [type_of(self[fields.index(k)])
-                if k in fields else TypeVariable()
-                for k in master_type_constructor.\
-                    __parameters__]
-        Also, add a data con to type con
-    """
 
     base_class = namedtuple(data_con_name, ["i{}".format(i)
                                             for i, _ in enumerate(fields)])
@@ -106,28 +62,21 @@ def generate_data_constructor(data_con_name, fields,
 def build_adt(typename, type_args, data_constructors, to_derive):
     """
     Create a new ADT
-
-    Arguments:
-        typename {str}:
-        A string for the name of type con
-
-        type_args {[str]}:
-        A list of strings for the type parameters.
-        - all the strings should be lowercase
-        - strings should be unique
-
-        data_constructors {[(name, [field])]}:
-        refer to the data constructor gen func.
-
-        to_derive {[TypeClass]}:
-        a list of type classes
+        typename str: name of type con
+        type_args [str]
+        data_constructors [(data_con_name (str), Signature)]
+        to_derive [TypeClass]:
 
     Returns:
         The type constructor with data cons
     """
 
     adt_type = generate_type_constructor(typename, type_args)
-    # adt_type = generate_type_constructor(typename, type_args)
+    for key, val in data_constructors:
+        for i in val:
+            if isinstance(i, TypeSignatureHigherKind) and \
+                    isinstance(i.constructor, str):
+                i.constructor = adt_type
     data_cons = [generate_data_constructor(dc_name, dc_field, adt_type, i)
                  for i, (dc_name, dc_field) in enumerate(data_constructors)]
 
