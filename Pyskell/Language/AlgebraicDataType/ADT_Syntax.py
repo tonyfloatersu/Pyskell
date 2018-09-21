@@ -29,6 +29,7 @@ class BinT(HigherKT("a")):
     Empty: gT / td("BinT", "a")
     Leaf: gT / "a" >> td("BinT", "a")
     Node: gT / td("BinT", "a") >> td("BinT", "a") >> td("BinT", "a")
+Empty, Leaf, Node = BinT.repertoire
 """
 
 
@@ -111,4 +112,6 @@ class AlgebraDT(Syntax):
                          for key, val in annotations.items()]
 
         m_all = build_adt(name, type_args, data_con_info, self.deriving)
-        return m_all
+        ret = m_all[0]
+        setattr(ret, 'repertoire', m_all[1:])
+        return ret

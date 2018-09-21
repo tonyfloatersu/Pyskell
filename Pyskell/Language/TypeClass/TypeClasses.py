@@ -1,5 +1,5 @@
 from ..TypedFunc.TypeSignature import is_builtin_type
-from ..PatternMatching import nt_to_tuple
+from ..Pattern.PatternMatching import nt_to_tuple
 from ..Syntax.Basic import TS, C, Instance
 from .TypeClass import *
 from ..TypedFunc.TypedFunction import TypedFunction

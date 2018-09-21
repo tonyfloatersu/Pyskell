@@ -23,6 +23,10 @@ class TypedFunction(OriginType):
         if len(self.fn_args) == len(args) + 1:
             eval_res = self.fn(*args)
             unify_type(result_type, type_of(eval_res))
+            # TODO: CHECK IF THIS ADDITIONAL STEP CAN BE APPLIED
+            # THE ADDITIONAL STEP IS TO COUNTER unify_type do not change type
+            if hasattr(eval_res, '__type__'):
+                eval_res.__type__ = lambda: result_type
             return eval_res
         return TypedFunction(partial(self.fn, *args),
                              self.fn_args[len(args):], result_type)

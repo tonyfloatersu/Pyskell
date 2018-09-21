@@ -1,4 +1,4 @@
-from .AlgebraicDataType.ADT import ADT
+from ..AlgebraicDataType.ADT import ADT
 
 
 def nt_to_tuple(nt):
