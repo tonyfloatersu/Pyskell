@@ -1,5 +1,4 @@
-from .Basic import *
-# from .QuickLambda import __
-# from .Guard import *
-# from .Pattern import *
-# from .ADTs import *
+from .Basic import (Syntax, Instance, TS, Signature, C, py_func,
+                    undefined, t, typify_py_func, cli_t)
+from .Guard import (g, otherwise, Guard)
+from .QuickLambda import __

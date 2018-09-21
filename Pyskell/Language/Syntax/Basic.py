@@ -122,7 +122,7 @@ def typify_py_func(fn, high=None):
     return TS(Signature(type_name_list, []))
 
 
-def _t(func):
+def cli_t(func):
     temp_res = fresh(type_of(func), {})
 
     def recursive_checker(some_fn):

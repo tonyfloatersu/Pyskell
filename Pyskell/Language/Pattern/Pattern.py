@@ -35,11 +35,6 @@ class MatchStack(object):
         return cls.get_frame().env_cache.get(name, undefined)
 
 
-"""
-The IMPLEMENTATION OF THE PATTERN MATCHING IS NOT THREAD SAFE
-"""
-
-
 class PatternBindingList(Syntax, PatternMatchListBind):
     def __init__(self, head, tail):
         super(PatternBindingList, self).__init__("Error Pattern Matching List")

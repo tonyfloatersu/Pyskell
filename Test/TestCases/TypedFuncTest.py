@@ -1,12 +1,5 @@
-from Pyskell.Language.TypeClasses import *
-from Pyskell.Language.Syntax import __
-from Pyskell.Language.EnumList import *
-from Pyskell.Language.PyskellTypeSystem import *
-from Pyskell.Language.Syntax.Pattern import *
-from Pyskell.Language.Syntax.Guard import *
-from Pyskell.Language.Syntax.ADTs import *
-from Pyskell.Language.EnumList import *
-
+from Pyskell.Language import __
+from Pyskell.Language import *
 
 import unittest
 
@@ -29,5 +22,7 @@ class TypedFuncTest(unittest.TestCase):
 
         self.assertEqual(show_2 % 1 * show % 12, "112")
 
-        self.assertEqual(str(type_of(show * ((__ + " verb test") ** (C / str >> str)))),
-                         "(str -> str)")
+        self.assertEqual(
+            str(type_of(
+                show * ((__ + " verb test") ** (C / str >> str)))),
+            "(str -> str)")

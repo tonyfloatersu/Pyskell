@@ -1,6 +1,5 @@
 import unittest
-from Pyskell.Language.TypeClasses import *
-from Pyskell.Language.EnumList import L
+from Pyskell.Language import show, L
 
 
 class ShowTest(unittest.TestCase):

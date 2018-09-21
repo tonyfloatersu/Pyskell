@@ -1,7 +1,6 @@
 from .ADT import *
-from ..Syntax import Syntax
+from ..Syntax.Basic import Syntax, Signature
 from ..TypeClass.TypeClass import TypeClassMeta
-from ..Syntax.Basic import Signature
 from inspect import isclass
 
 

@@ -1,6 +1,5 @@
 import unittest
-from Pyskell.Language.Syntax.Pattern import *
-from Pyskell.Language.EnumList import L
+from Pyskell.Language import *
 
 
 class CaseTest(unittest.TestCase):

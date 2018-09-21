@@ -1,6 +1,5 @@
-from Pyskell.Language.Syntax.Guard import *
-from Pyskell.Language.EnumList import L
-from Pyskell.Language.Syntax.QuickLambda import __
+from Pyskell.Language import __
+from Pyskell.Language import *
 import unittest
 
 

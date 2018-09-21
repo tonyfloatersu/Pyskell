@@ -1,6 +1,5 @@
 import unittest
-from Pyskell.Language.EnumList import L
-from Pyskell.Language.TypeClasses import *
+from Pyskell.Language import L, show, TS, C
 
 
 class HLTest(unittest.TestCase):

@@ -1,14 +1,18 @@
 import unittest
-from Pyskell.Language.Syntax import *
-from Pyskell.Language.TypeClasses import *
-from Pyskell.Language.EnumList import L, Enum
-from Pyskell.Language.Syntax.QuickLambda import __
+from Pyskell.Language import __
+from Pyskell.Language import *
 
 
 class ADTTest(unittest.TestCase):
     def test_adt(self):
-        Unit, V1, V2, V3 = data.Unit == d.V1 | d.V2 | d.V3 \
-                                      & deriving(Eq, Ord, Enum, Bounded)
+
+        @AlgebraDT(deriving=(Eq, Ord, Enum, Bounded))
+        class Unit(HigherKT()):
+            V1: gT / td("Unit")
+            V2: gT / td("Unit")
+            V3: gT / td("Unit")
+        V1, V2, V3 = Unit.repertoire
+
         self.assertEqual(V1, V1)
         self.assertEqual(V2, V2)
         self.assertEqual(V3, V3)
