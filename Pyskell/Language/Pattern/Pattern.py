@@ -1,6 +1,9 @@
 from collections import deque
-from .Basic import *
-from Pyskell.Language.TypeClass.TypeClasses import show
+from ..Syntax.Basic import *
+from ..TypeClass.TypeClasses import show
+from .PatternMatching import PatternMatchBind
+from .PatternMatching import PatternMatchListBind
+from .PatternMatching import pattern_match
 
 
 class MatchStackFrame(object):
