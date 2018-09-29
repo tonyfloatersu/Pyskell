@@ -1,5 +1,4 @@
-from .TestCases import *
-import unittest
+from Test.TestCases import *
 
 
 if __name__ == '__main__':

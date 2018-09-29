@@ -6,12 +6,16 @@ from Pyskell.Language import *
 class ADTTest(unittest.TestCase):
     def test_adt(self):
 
-        @AlgebraDT(deriving=(Eq, Ord, Enum, Bounded))
+        @AlgebraDT(deriving=(Eq, Ord, Enum, Bounded, Show))
         class Unit(HigherKT()):
             V1: gT / td("Unit")
             V2: gT / td("Unit")
             V3: gT / td("Unit")
         V1, V2, V3 = Unit.repertoire
+
+        self.assertEqual(show % V1, "V1")
+        self.assertEqual(show % V2, "V2")
+        self.assertEqual(show % V3, "V3")
 
         self.assertEqual(V1, V1)
         self.assertEqual(V2, V2)
@@ -22,8 +26,8 @@ class ADTTest(unittest.TestCase):
 
         Instance(Show, Unit).where(
             show=lambda _x: ~(Guard(_x) | g(__ == V1) >> "a"
-                              | g(__ == V2) >> "b"
-                              | otherwise >> "c")
+                                        | g(__ == V2) >> "b"
+                                        | otherwise >> "c")
         )
 
         self.assertEqual("a", show % V1)
