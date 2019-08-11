@@ -48,15 +48,27 @@ class EApplication(Expression):
 
 
 class ELet(Expression):
+    def __init__(self, x, e1, e2):
+        self.x = x
+        self.e1 = e1
+        self.e2 = e2
+
     def show(self):
-        pass
+        return "([{e1} / {x}] {e2})".format(e1=self.e1.show(),
+                                            x=self.x,
+                                            e2=self.e2.show())
 
     def get_type(self, type_env, type_inference):
         pass
 
 
 class TypeOperator:
-    pass
+    def __init__(self, binder, abstracter):
+        self.binder = set(binder)
+        self.abstracter = abstracter
+
+    def get_free_variable(self):
+        return self.abstracter.get_free_varible() - self.binder
 
 
 class Type(metaclass=ABCMeta):
