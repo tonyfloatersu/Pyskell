@@ -40,16 +40,30 @@ class EAbstraction(Expression):
 
 
 class EApplication(Expression):
-    pass
+    def show(self):
+        pass
+
+    def get_type(self, type_env, type_inference):
+        pass
 
 
 class ELet(Expression):
+    def show(self):
+        pass
+
+    def get_type(self, type_env, type_inference):
+        pass
+
+
+class TypeOperator:
     pass
 
 
 class Type(metaclass=ABCMeta):
+    @abstractmethod
     def free_type_variable(self):
-        return set()
+        pass
 
+    @abstractmethod
     def __str__(self):
-        return str(self)
+        pass
