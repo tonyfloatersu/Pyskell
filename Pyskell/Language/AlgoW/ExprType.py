@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from .Inference import Inference
 
 
 class Expression(metaclass=ABCMeta):
@@ -40,8 +41,12 @@ class EAbstraction(Expression):
 
 
 class EApplication(Expression):
+    def __init__(self, e1, e2):
+        self.e1 = e1
+        self.e2 = e2
+
     def show(self):
-        pass
+        return "({} {})".format(self.e1.show(), self.e2.show())
 
     def get_type(self, type_env, type_inference):
         pass
@@ -57,6 +62,17 @@ class ELet(Expression):
         return "([{e1} / {x}] {e2})".format(e1=self.e1.show(),
                                             x=self.x,
                                             e2=self.e2.show())
+
+    def get_type(self, type_env, type_inference):
+        pass
+
+
+class ELit(Expression):
+    def __init__(self, lit):
+        self.lit = lit
+
+    def show(self):
+        return self.lit.show()
 
     def get_type(self, type_env, type_inference):
         pass
