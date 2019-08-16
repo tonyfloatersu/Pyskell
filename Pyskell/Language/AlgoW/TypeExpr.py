@@ -86,3 +86,14 @@ class TTupleOp(TypeOperator):
 
 class TListOp(TypeOperator):
     pass
+
+
+class Context:
+    def __init__(self, gamma):
+        self.gamma = gamma
+
+    def __contains__(self, item):
+        return item in self.gamma
+
+    def __getitem__(self, item):
+        return self.gamma[item]
