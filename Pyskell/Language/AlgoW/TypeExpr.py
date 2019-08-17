@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from functools import reduce
 
 
 class Type(metaclass=ABCMeta):
@@ -25,12 +26,12 @@ class TypeOperator:
             raise Exception("Error Initialize Type Operator in abstracter")
         self.abstracter = abstracter
 
-    def get_free_variable(self):
+    def free_type_variable(self):
         return self.abstracter.free_type_variable() - self.binder
 
     def __str__(self):
-        return "<{}>.{}".format(", ".join([i for i in self.binder]),
-                                str(self.abstracter))
+        return "<{}>.({})".format(", ".join(map(str, self.binder)),
+                                  str(self.abstracter))
 
 
 class TVariable(Type):
@@ -43,7 +44,7 @@ class TVariable(Type):
         return {self.name}
 
     def __str__(self):
-        pass
+        return self.name
 
     def apply_sub(self, sub):
         pass
@@ -57,10 +58,10 @@ class TArrow(Type):
         self.t2 = t2
 
     def free_type_variable(self):
-        pass
+        return self.t1.free_type_variable() | self.t2.free_type_variable()
 
     def __str__(self):
-        pass
+        return "{} -> {}".format(str(self.t1), str(self.t2))
 
     def apply_sub(self, sub):
         pass
@@ -89,8 +90,18 @@ class TListOp(TypeOperator):
 
 
 class Context:
+    """
+    \Gamma: x: \tau
+    """
     def __init__(self, gamma):
+        if not isinstance(gamma, dict):
+            raise Exception("Error Initialize Context Gamma")
         self.gamma = gamma
+
+    def free_type_variables(self):
+        return reduce(
+            lambda x, y: x.free_type_variable() | y.free_type_variable(),
+            self.gamma.values())
 
     def __contains__(self, item):
         return item in self.gamma
