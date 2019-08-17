@@ -88,7 +88,9 @@ class TCon(Type):
         return set()
 
     def __str__(self):
-        if isinstance(self.py_t, type):
+        if isinstance(self.py_t, tuple):
+            return "({})".format(", ".join(map(str, self.py_t)))
+        elif isinstance(self.py_t, type):
             return self.py_t.__name__
         return str(self.py_t)
 
@@ -103,7 +105,21 @@ class TCon(Type):
 
 
 class TTupleOp(TypeOperator):
-    pass
+    def __init__(self, tuple_types):
+        for tp in tuple_types:
+            if not isinstance(tp, Type):
+                raise Exception("Error Initialize Tuple Type Operator")
+        super(TTupleOp, self).__init__(
+            [tp for tp in tuple_types if isinstance(tp, TVariable)],
+            TCon(tuple(tuple_types))
+        )
+
+    def __str__(self):
+        if len(self.binder) == 0:
+            return str(self.abstracter)
+        else:
+            return "<{}>.{}".format(", ".join(map(str, self.binder)),
+                                    str(self.abstracter))
 
 
 class TListOp(TypeOperator):
