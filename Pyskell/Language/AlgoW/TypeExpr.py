@@ -41,13 +41,19 @@ class TVariable(Type):
         self.name = name
 
     def free_type_variable(self):
-        return {self.name}
+        return {self}
 
     def __str__(self):
         return self.name
 
     def apply_sub(self, sub):
         pass
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return isinstance(other, TVariable) and other.name == self.name
 
 
 class TArrow(Type):
@@ -100,8 +106,9 @@ class Context:
 
     def free_type_variables(self):
         return reduce(
-            lambda x, y: x.free_type_variable() | y.free_type_variable(),
-            self.gamma.values())
+            lambda x, y: x | y,
+            map(lambda x: x.free_type_variable(), self.gamma.values())
+        )
 
     def __contains__(self, item):
         return item in self.gamma
