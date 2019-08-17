@@ -115,11 +115,10 @@ class TTupleOp(TypeOperator):
         )
 
     def __str__(self):
-        if len(self.binder) == 0:
-            return str(self.abstracter)
-        else:
-            return "<{}>.{}".format(", ".join(map(str, self.binder)),
-                                    str(self.abstracter))
+        result = str(self.abstracter)
+        if len(self.binder) > 0:
+            result = "<{}>".format(", ".join(map(str, self.binder))) + result
+        return result
 
 
 class TListOp(TypeOperator):
@@ -128,14 +127,14 @@ class TListOp(TypeOperator):
             raise Exception("Error Initialize List Type Operator")
         super(TListOp, self).__init__(
             [] if not isinstance(type_of_list, TVariable) else [type_of_list],
-            type_of_list)
+            type_of_list
+        )
 
     def __str__(self):
-        if len(self.binder) == 0:
-            return "[{}]".format(str(self.abstracter))
-        else:
-            return "<{}>.[{}]".format(", ".join(map(str, self.binder)),
-                                      str(self.abstracter))
+        result = "[{}]".format(str(self.abstracter))
+        if len(self.binder) > 0:
+            result = "<{}>".format(", ".join(map(str, self.binder))) + result
+        return result
 
 
 class Context:
