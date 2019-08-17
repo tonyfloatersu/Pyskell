@@ -72,19 +72,34 @@ class TArrow(Type):
     def apply_sub(self, sub):
         pass
 
+    def __hash__(self):
+        return hash((self.t1, self.t2))
+
+    def __eq__(self, other):
+        return isinstance(other, TArrow) \
+            and other.t1 == self.t1 and other.t2 == self.t2
+
 
 class TCon(Type):
     def __init__(self, py_t):
         self.py_t = py_t
 
     def free_type_variable(self):
-        return {}
+        return set()
 
     def __str__(self):
+        if isinstance(self.py_t, type):
+            return self.py_t.__name__
         return str(self.py_t)
 
     def apply_sub(self, sub):
         pass
+
+    def __hash__(self):
+        return hash(self.py_t)
+
+    def __eq__(self, other):
+        return isinstance(other, TCon) and other.py_t == self.py_t
 
 
 class TTupleOp(TypeOperator):
@@ -92,7 +107,19 @@ class TTupleOp(TypeOperator):
 
 
 class TListOp(TypeOperator):
-    pass
+    def __init__(self, type_of_list):
+        if not isinstance(type_of_list, Type):
+            raise Exception("Error Initialize List Type Operator")
+        super(TListOp, self).__init__(
+            [] if not isinstance(type_of_list, TVariable) else [type_of_list],
+            type_of_list)
+
+    def __str__(self):
+        if len(self.binder) == 0:
+            return "[{}]".format(str(self.abstracter))
+        else:
+            return "<{}>.[{}]".format(", ".join(map(str, self.binder)),
+                                      str(self.abstracter))
 
 
 class Context:
