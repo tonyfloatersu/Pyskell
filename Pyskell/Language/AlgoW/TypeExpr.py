@@ -182,7 +182,12 @@ class TypeOperator:
         return result
 
     def instantiation(self):
-        pass
+        return self.abstracter.apply(
+            Substitution({
+                var: TVariable(glob_infer.new_type_var_name())
+                for var in self.binder
+            })
+        )
 
 
 class Context:
@@ -212,8 +217,12 @@ class Context:
     def __getitem__(self, item):
         return self.gamma[item]
 
-    def generalization(self):
-        pass
+    def generalization(self, tp):
+        if not isinstance(tp, Type):
+            raise Exception("Error in Generalization of Type")
+        return TypeOperator(
+            tp.free_type_variable() - self.free_type_variables(), tp
+        )
 
 
 class Inference:
