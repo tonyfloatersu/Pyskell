@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from .Inference import Inference
 
 
 class Expression(metaclass=ABCMeta):

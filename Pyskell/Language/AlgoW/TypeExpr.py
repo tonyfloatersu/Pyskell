@@ -12,8 +12,22 @@ class Type(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def subst(self, sub):
+    def apply(self, sub):
         pass
+
+
+class Substitution(dict):
+    def compose(self, oth: 'Substitution'):
+        return Substitution(
+            self.items() | {k: v.apply(self) for k, v in oth.items()}.items()
+        )
+
+    def __str__(self):
+        return "{{{}}}".format(
+            ", ".join(
+                ["{0} : {1}".format(str(k), str(v)) for k, v in self.items()]
+            )
+        )
 
 
 class TVariable(Type):
@@ -28,7 +42,7 @@ class TVariable(Type):
     def __str__(self):
         return self.name
 
-    def subst(self, sub: dict):
+    def apply(self, sub: Substitution):
         if self in sub.keys():
             return sub[self]
         return self
@@ -51,11 +65,15 @@ class TArrow(Type):
         return self.t1.free_type_variable() | self.t2.free_type_variable()
 
     def __str__(self):
-        return "{} -> {}".format(str(self.t1), str(self.t2))
+        return "{} -> {}".format(
+            str(self.t1) if not isinstance(self.t1, TArrow)
+            else "({})".format(str(self.t1)),
+            str(self.t2)
+        )
 
-    def subst(self, sub: dict):
-        lhs = self.t1.subst(sub)
-        rhs = self.t2.subst(sub)
+    def apply(self, sub: Substitution):
+        lhs = self.t1.apply(sub)
+        rhs = self.t2.apply(sub)
         return TArrow(lhs, rhs)
 
     def __hash__(self):
@@ -78,7 +96,7 @@ class TCon(Type):
             return self.py_t.__name__
         return str(self.py_t)
 
-    def subst(self, sub: dict):
+    def apply(self, sub: Substitution):
         return self
 
     def __hash__(self):
@@ -104,9 +122,9 @@ class TTuple(Type):
             map(lambda x: x.free_type_variable(), self.tuple_types)
         )
 
-    def subst(self, sub: dict):
+    def apply(self, sub: Substitution):
         return TTuple(
-            *[ttp.subst(sub) for ttp in self.tuple_types]
+            *[ttp.apply(sub) for ttp in self.tuple_types]
         )
 
     def __hash__(self):
@@ -129,8 +147,8 @@ class TList(Type):
     def free_type_variable(self):
         return self.list_type.free_type_variable()
 
-    def subst(self, sub: dict):
-        return TList(self.list_type.subst(sub))
+    def apply(self, sub: Substitution):
+        return TList(self.list_type.apply(sub))
 
     def __hash__(self):
         return hash(self.list_type)
@@ -152,9 +170,9 @@ class TypeOperator:
     def free_type_variable(self):
         return self.abstracter.free_type_variable() - self.binder
 
-    def subst(self, sub: dict):
+    def apply(self, sub: Substitution):
         binder_updated = {k for k in self.binder if k not in sub.keys()}
-        abstracter_updated = self.abstracter.subst(sub)
+        abstracter_updated = self.abstracter.apply(sub)
         return TypeOperator(binder_updated, abstracter_updated)
 
     def __str__(self):
@@ -162,6 +180,9 @@ class TypeOperator:
         if len(self.binder) > 0:
             result = "<{}>.".format(", ".join(map(str, self.binder))) + result
         return result
+
+    def instantiation(self):
+        pass
 
 
 class Context:
@@ -179,9 +200,9 @@ class Context:
             map(lambda x: x.free_type_variable(), self.gamma.values())
         )
 
-    def subst(self, sub: dict):
+    def apply(self, sub: Substitution):
         return Context({
-            expr: tp.subst(sub)
+            expr: tp.apply(sub)
             for expr, tp in self.gamma.items()
         })
 
@@ -190,3 +211,55 @@ class Context:
 
     def __getitem__(self, item):
         return self.gamma[item]
+
+    def generalization(self):
+        pass
+
+
+class Inference:
+    def __init__(self):
+        self.__next_type_var_id = 0
+
+    def new_type_var_name(self):
+        name = 't' + str(self.__next_type_var_id)
+        self.__next_type_var_id += 1
+        return name
+
+    def unify(self, t0: Type, t1: Type):
+        if isinstance(t0, TArrow) and isinstance(t1, TArrow):
+            unify_lhs = self.unify(t0.t1, t1.t1)
+            unify_rhs = self.unify(t0.t2.apply(unify_lhs),
+                                   t1.t2.apply(unify_lhs))
+            return unify_rhs.compose(unify_lhs)
+        elif isinstance(t0, TVariable):
+            return self.bind(t0.name, t1)
+        elif isinstance(t1, TVariable):
+            return self.bind(t1.name, t0)
+        elif isinstance(t0, TCon) and isinstance(t1, TCon) \
+                and t0.py_t == t1.py_t:
+            return Substitution()
+        elif isinstance(t0, TList) and isinstance(t1, TList):
+            return self.unify(t0.list_type, t1.list_type)
+        elif isinstance(t0, TTuple) and isinstance(t1, TTuple) \
+                and len(t0.tuple_types) == len(t1.tuple_types):
+            sub_l = self.unify(t0.tuple_types[0], t1.tuple_types[0])
+            if len(t0.tuple_types) == 1:
+                return sub_l
+            t0_tail = TTuple(*(t0.tuple_types[1:]))
+            t1_tail = TTuple(*(t1.tuple_types[1:]))
+            sub_r = self.unify(t0_tail, t1_tail)
+            return sub_r.compose(sub_l)
+        raise Exception("Error Unifying {} and {}".format(str(t0), str(t1)))
+
+    @staticmethod
+    def bind(name, tp):
+        if tp == TVariable(name):
+            return Substitution()
+        elif TVariable(name) in tp.free_type_variable():
+            raise Exception("Infinite type caused by {} and {}"
+                            .format(name, str(tp)))
+        else:
+            return Substitution({TVariable(name): tp})
+
+
+glob_infer = Inference()
