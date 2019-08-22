@@ -13,7 +13,7 @@ class EVariable(Expression):
     def __hash__(self):
         return hash(self.name)
 
-    def get_type(self, type_env: Context, type_inference: Inference):
+    def get_type(self, type_env: Context):
         if self in type_env:
             return Substitution(), type_env[self].instantiation()
         raise Exception("Unbound Free Variable: " + self.name)
@@ -30,10 +30,10 @@ class EAbstraction(Expression):
     def __str__(self):
         return "(\\{} -> {})".format(self.name, str(self.expr))
 
-    def get_type(self, t_env: Context, type_inference: Inference):
+    def get_type(self, t_env: Context):
         tv = TVariable(t_env.free_type_variables())
         new_env = t_env.remove(self.name).add(self.name, TypeOperator([], tv))
-        sub_1, type_1 = self.expr.get_type(new_env, type_inference)
+        sub_1, type_1 = self.expr.get_type(new_env)
         return sub_1, TArrow(tv.apply(sub_1), type_1)
 
 
@@ -45,7 +45,7 @@ class EApplication(Expression):
     def __str__(self):
         return "({} {})".format(str(self.expr_func), str(self.expr_args))
 
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass
 
 
@@ -61,7 +61,7 @@ class ELet(Expression):
     def __str__(self):
         return "([{0} / {1}] {2})".format(str(self.e1), self.x, str(self.e2))
 
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass
 
 
@@ -72,8 +72,8 @@ class ELiteral(Expression):
     def __str__(self):
         return "lit[{}]".format(str(self.lit))
 
-    def get_type(self, type_env, type_inference):
-        pass
+    def get_type(self, type_env):
+        return Substitution(), TCon(type(self.lit))
 
 
 class EIf(Expression):
@@ -91,7 +91,7 @@ class EIf(Expression):
                                               str(self.e1),
                                               str(self.e2))
 
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass
 
 
@@ -104,7 +104,7 @@ class EFixP(Expression):
     def __str__(self):
         return "fix {}".format(str(self.expr))
 
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass
 
 
@@ -148,5 +148,5 @@ class EOp(Expression):
                                       str(self.e1),
                                       str(self.e2))
 
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass

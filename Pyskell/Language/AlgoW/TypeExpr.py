@@ -19,7 +19,7 @@ class Expression(metaclass=ABCMeta):
         return True
 
     @abstractmethod
-    def get_type(self, type_env, type_inference):
+    def get_type(self, type_env):
         pass
 
 
