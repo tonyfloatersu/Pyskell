@@ -1,24 +1,4 @@
-from abc import ABCMeta, abstractmethod
-
-
-class Expression(metaclass=ABCMeta):
-    @abstractmethod
-    def __str__(self):
-        pass
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        if len(other.__dict__) != len(self.__dict__):
-            return False
-        for k, v in other.__dict__.items():
-            if k not in self.__dict__ or self.__dict__[k] != v:
-                return False
-        return True
-
-    @abstractmethod
-    def get_type(self, type_env, type_inference):
-        pass
+from .TypeExpr import *
 
 
 class EVariable(Expression):
@@ -30,18 +10,19 @@ class EVariable(Expression):
     def __str__(self):
         return self.name
 
-    def get_type(self, type_env, type_inference):
-        if self.name in type_env:
-            """
-            TOBE implemented
-            """
-            pass
+    def __hash__(self):
+        return hash(self.name)
+
+    def get_type(self, type_env: Context, type_inference: Inference):
+        if self in type_env:
+            return Substitution(), type_env[self].instantiation()
         raise Exception("Unbound Free Variable: " + self.name)
 
 
 class EAbstraction(Expression):
     def __init__(self, name, expr):
-        if (not isinstance(name, str)) or (not isinstance(expr, Expression)):
+        if (not isinstance(name, Expression)) \
+                or (not isinstance(expr, Expression)):
             raise Exception("Initialize Syntax Expression Abstraction Error")
         self.name = name
         self.expr = expr
@@ -49,8 +30,11 @@ class EAbstraction(Expression):
     def __str__(self):
         return "(\\{} -> {})".format(self.name, str(self.expr))
 
-    def get_type(self, type_env, type_inference):
-        pass
+    def get_type(self, t_env: Context, type_inference: Inference):
+        tv = TVariable(t_env.free_type_variables())
+        new_env = t_env.remove(self.name).add(self.name, TypeOperator([], tv))
+        sub_1, type_1 = self.expr.get_type(new_env, type_inference)
+        return sub_1, TArrow(tv.apply(sub_1), type_1)
 
 
 class EApplication(Expression):

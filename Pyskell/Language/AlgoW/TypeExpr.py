@@ -1,5 +1,26 @@
 from abc import abstractmethod, ABCMeta
 from functools import reduce
+from typing import Dict
+
+
+class Expression(metaclass=ABCMeta):
+    @abstractmethod
+    def __str__(self):
+        pass
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        if len(other.__dict__) != len(self.__dict__):
+            return False
+        for k, v in other.__dict__.items():
+            if k not in self.__dict__ or self.__dict__[k] != v:
+                return False
+        return True
+
+    @abstractmethod
+    def get_type(self, type_env, type_inference):
+        pass
 
 
 class Type(metaclass=ABCMeta):
@@ -193,8 +214,9 @@ class TypeOperator:
 class Context:
     """
     \Gamma: x: \tau
+    A map from key of Expression to value of TypeOperator
     """
-    def __init__(self, gamma):
+    def __init__(self, gamma: Dict[Expression, TypeOperator]):
         if not isinstance(gamma, dict):
             raise Exception("Error Initialize Context Gamma")
         self.gamma = gamma
@@ -209,6 +231,17 @@ class Context:
         return Context({
             expr: tp.apply(sub)
             for expr, tp in self.gamma.items()
+        })
+
+    def add(self, expr, type_op):
+        copy_gamma = {k: v for k, v in self.gamma.items()}
+        copy_gamma[expr] = type_op
+        return Context(copy_gamma)
+
+    def remove(self, expr):
+        return Context({
+            k: v for k, v in self.gamma
+            if k != expr
         })
 
     def __contains__(self, item):
