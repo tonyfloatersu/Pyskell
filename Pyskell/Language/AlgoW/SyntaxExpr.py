@@ -31,7 +31,7 @@ class EAbstraction(Expression):
         return "(\\{} -> {})".format(self.name, str(self.expr))
 
     def get_type(self, t_env: Context):
-        tv = TVariable(t_env.free_type_variables())
+        tv = TVariable(glob_infer.new_type_var_name())
         new_env = t_env.remove(self.name).add(self.name, TypeOperator([], tv))
         sub_1, type_1 = self.expr.get_type(new_env)
         return sub_1, TArrow(tv.apply(sub_1), type_1)
@@ -39,14 +39,21 @@ class EAbstraction(Expression):
 
 class EApplication(Expression):
     def __init__(self, expr_func, expr_args):
+        if (not isinstance(expr_func, Expression)) \
+                or (not isinstance(expr_args, Expression)):
+            raise Exception("Initialize Syntax Expression Application Error")
         self.expr_func = expr_func
         self.expr_args = expr_args
 
     def __str__(self):
         return "({} {})".format(str(self.expr_func), str(self.expr_args))
 
-    def get_type(self, type_env):
-        pass
+    def get_type(self, type_env: Context):
+        tv = TVariable(glob_infer.new_type_var_name())
+        sub_1, type_1 = self.expr_args.get_type(type_env)
+        sub_2, type_2 = self.expr_func.get_type(type_env.apply(sub_1))
+        sub_3 = glob_infer.unify(type_1.apply(sub_2), TArrow(type_2, tv))
+        return sub_3.compose(sub_2).compose(sub_1), tv.apply(sub_3)
 
 
 class ELet(Expression):
@@ -62,7 +69,11 @@ class ELet(Expression):
         return "([{0} / {1}] {2})".format(str(self.e1), self.x, str(self.e2))
 
     def get_type(self, type_env):
-        pass
+        sub_1, type_1 = self.e1.get_type(type_env)
+        new_env = type_env.apply(sub_1)
+        type_1_op = new_env.generalize(type_1)
+        sub_2, type_2 = self.e2.get_type(new_env.add(self.e1, type_1_op))
+        return sub_1.compose(sub_2), type_2
 
 
 class ELiteral(Expression):
@@ -97,7 +108,7 @@ class EIf(Expression):
 
 class EFixP(Expression):
     def __init__(self, expr):
-        if not isinstance(expr, Exception):
+        if not isinstance(expr, Expression):
             raise Exception("Initialize Syntax Expression Fix Point Error")
         self.expr = expr
 
@@ -105,7 +116,10 @@ class EFixP(Expression):
         return "fix {}".format(str(self.expr))
 
     def get_type(self, type_env):
-        pass
+        sub_1, type_1 = self.expr.get_type(type_env)
+        tv = TVariable(glob_infer.new_type_var_name())
+        sub_2 = glob_infer.unify(TArrow(tv, tv), type_1)
+        return sub_2, tv.apply(sub_1)
 
 
 class BinOp:
