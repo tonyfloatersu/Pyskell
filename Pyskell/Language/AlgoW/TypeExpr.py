@@ -213,7 +213,7 @@ class TypeOperator:
 
 class Context:
     """
-    \Gamma: x: \tau
+    Gamma: x: tau
     A map from key of Expression to value of TypeOperator
     """
     def __init__(self, gamma: Dict[Expression, TypeOperator]):

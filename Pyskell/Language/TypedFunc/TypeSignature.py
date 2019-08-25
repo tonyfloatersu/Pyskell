@@ -1,9 +1,5 @@
-"""
-Types, identify yourself!
-Even if you are a function/mono-type/monad!
-It's somewhat about static type and Py-skell layer of type
-"""
 from ..HMTypeSystem import *
+from ..AlgoW import *
 import types
 
 __python_builtins__ = {
