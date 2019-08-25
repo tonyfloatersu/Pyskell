@@ -41,6 +41,8 @@ class TypeSignatureHigherKind(object):
         self.constructor = t_constructor
         self.parameters = t_parameters
 
+# old version
+
 
 def make_func_type(type_para_list):
     if len(type_para_list) < 2:
@@ -50,6 +52,24 @@ def make_func_type(type_para_list):
     else:
         return Arrow(type_para_list[0],
                      make_func_type(type_para_list[1:]))
+
+# new version
+
+
+def make_type(type_para_list):
+    if len(type_para_list) == 0:
+        raise TypeSignatureError("Type Signature Parameter List Length 0 Error")
+    if any(map(lambda x: not isinstance(x, Type), type_para_list)):
+        raise TypeSignatureError("Type Signature Parameter List Member Error")
+
+    def make_type_inner(tp_list):
+        return tp_list[0] if len(tp_list) == 1 else \
+            TArrow(tp_list[0], make_type_inner(tp_list[1:]))
+
+    return make_type_inner(type_para_list)
+
+
+# old version
 
 
 def type_sig_arg_build(argument, constraints, type_var_dict):
@@ -84,6 +104,14 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
     raise TypeSignatureError(
         "Type Signature Fail to Build Argument: {}".format(argument)
     )
+
+
+# new version
+
+def ts_args(argument, constraint):
+    if isinstance(argument, str) and argument.islower():
+        pass
+    # TODO: need to redesign how to build type signature arguments
 
 
 def type_sig_build(type_sig, type_var_dict=None):
