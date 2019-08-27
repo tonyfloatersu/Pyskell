@@ -30,13 +30,13 @@ class TypeSignatureError(Exception):
     pass
 
 
-class TypeSignature(object):
+class TypeSignature:
     def __init__(self, constraints, args):
         self.constraints = constraints
         self.args = args
 
 
-class TypeSignatureHigherKind(object):
+class TypeSignatureHigherKind:
     def __init__(self, t_constructor, t_parameters):
         self.constructor = t_constructor
         self.parameters = t_parameters
@@ -108,10 +108,20 @@ def type_sig_arg_build(argument, constraints, type_var_dict):
 
 # new version
 
-def ts_args(argument, constraint):
+def ts_args(argument):
+    # TODO: need to redesign how to build type signature arguments
+    # TODO: Higher-Kind-Type should be applied in type signature
     if isinstance(argument, str) and argument.islower():
         pass
-    # TODO: need to redesign how to build type signature arguments
+    elif isinstance(argument, list) and len(argument) == 1:
+        return TList(ts_args(argument[0]))
+    elif isinstance(argument, tuple):
+        return TTuple(*[ts_args(i) for i in argument])
+    elif isinstance(argument, type):
+        return TCon(argument)
+    raise TypeSignatureError(
+        "Type Signature Fail to Build Argument: {}".format(argument)
+    )
 
 
 def type_sig_build(type_sig, type_var_dict=None):
