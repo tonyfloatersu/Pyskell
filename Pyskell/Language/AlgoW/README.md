@@ -3,15 +3,9 @@
 > Yet a another small implementation on Algorithm W
 > Hindley Milner Type System
 
-The type system should have `expression`, `type` and `inference` part.
+## Kinds
 
-## Expression
+The kinds are shown with 3 forms: `star`, `->`, `constraint`.
 
-Expression part should have `Let`, `Lambda` (`abstraction`), `Application` and `Variable`.
+# Types
 
-### Variable
-
-Variable should enjoy the following rule
-$$
-\dfrac{}{}
-$$
