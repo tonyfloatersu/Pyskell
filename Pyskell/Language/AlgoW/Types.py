@@ -1,6 +1,5 @@
-from .Kinds import star, k_constraint, KindFunc, Kind
+from .Kinds import Kind, KindFunc
 from abc import ABCMeta, abstractmethod
-from .Infix import Infix
 
 
 class Type(metaclass=ABCMeta):
@@ -16,64 +15,76 @@ class Type(metaclass=ABCMeta):
     def apply(self, sub):
         pass
 
-    @staticmethod
     @abstractmethod
-    def __kind__():
+    def __kind__(self):
         pass
 
 
-"""
-data Type  = TVar Tyvar | TCon Tycon | TAp Type Type | TGen Int
-             deriving Eq
-
-data Tyvar = Tyvar Id Kind
-             deriving Eq
-
-data Tycon = Tycon Id Kind
-             deriving Eq
-"""
+def _kind(something):
+    if not hasattr(something, "__kind__"):
+        raise "{} does not have __kind__() attr".format(str(something))
+    return something.__kind__()
 
 
 class TypeVariable:
     def __init__(self, name, kind):
         if (not isinstance(name, str)) or (not isinstance(kind, Kind)):
-            raise Exception("Error Initialize TypeVariable")
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
         self.name = name
         self.kind = kind
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return (self.name == other.name) and (self.kind == other.kind)
 
-class TypeConstraint:
+    def __kind__(self):
+        return self.kind
+
+
+class TypeConstructor:
     def __init__(self, name, kind):
         if not isinstance(kind, Kind):
-            raise Exception("Error Initialize TypeConstraint")
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
         self.name = name
         self.kind = kind
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return (self.name == other.name) and (self.kind == other.kind)
+
+    def __kind__(self):
+        return self.kind
 
 
 class TVariable(Type):
     def __init__(self, tpv):
         if not isinstance(tpv, TypeVariable):
-            raise Exception("Error Initialize TVariable")
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
         self.tpv = tpv
 
     def free_type_variable(self):
-        pass
+        return self.tpv
 
     def __str__(self):
-        pass
+        return self.tpv.name
 
     def apply(self, sub):
         pass
 
-    @staticmethod
-    def __kind__():
-        pass
+    def __kind__(self):
+        return _kind(self.tpv)
 
 
 class TConstraint(Type):
     def __init__(self, tco):
-        if not isinstance(tco, TypeConstraint):
-            raise Exception("Error Initialize TVariable")
+        if not isinstance(tco, TypeConstructor):
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
         self.tco = tco
 
     def free_type_variable(self):
@@ -85,6 +96,48 @@ class TConstraint(Type):
     def apply(self, sub):
         pass
 
-    @staticmethod
-    def __kind__():
+    def __kind__(self):
+        return _kind(self.tco)
+
+
+class TApplication(Type):
+    def __init__(self, t0, t1):
+        if (not isinstance(t0, Type)) or (not isinstance(t1, Type)):
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
+        self.t0 = t0
+        self.t1 = t1
+
+    def free_type_variable(self):
+        pass
+
+    def __str__(self):
+        pass
+
+    def apply(self, sub):
+        pass
+
+    def __kind__(self):
+        if not isinstance(_kind(self.t0), KindFunc):
+            raise Exception("t0 has kind {}".format(str(_kind(self.t0))))
+        return _kind(self.t0).k1
+
+
+class TGeneralized(Type):
+    def __init__(self, gen_id):
+        if not isinstance(gen_id, int):
+            raise Exception("Error Initialize {}"
+                            .format(self.__class__.__name__))
+        self.gen_id = gen_id
+
+    def free_type_variable(self):
+        pass
+
+    def __str__(self):
+        pass
+
+    def apply(self, sub):
+        pass
+
+    def __kind__(self):
         pass
