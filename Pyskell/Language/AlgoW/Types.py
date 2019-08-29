@@ -74,7 +74,7 @@ class TVariable(Type):
         return self.tpv.name
 
     def apply(self, sub):
-        pass
+        return sub[self.tpv] if self.tpv in sub.keys() else self
 
     def __kind__(self):
         return _kind(self.tpv)
