@@ -8,10 +8,6 @@ class Type(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def __str__(self):
-        pass
-
-    @abstractmethod
     def apply(self, sub):
         pass
 
@@ -68,10 +64,7 @@ class TVariable(Type):
         self.tpv = tpv
 
     def free_type_variable(self):
-        return self.tpv
-
-    def __str__(self):
-        return self.tpv.name
+        return {self.tpv}
 
     def apply(self, sub):
         return sub[self.tpv] if self.tpv in sub.keys() else self
@@ -90,9 +83,6 @@ class TConstraint(Type):
     def free_type_variable(self):
         pass
 
-    def __str__(self):
-        pass
-
     def apply(self, sub):
         pass
 
@@ -109,10 +99,7 @@ class TApplication(Type):
         self.t1 = t1
 
     def free_type_variable(self):
-        pass
-
-    def __str__(self):
-        pass
+        return self.t0.free_type_variable() | self.t1.free_type_variable()
 
     def apply(self, sub):
         pass
@@ -131,13 +118,10 @@ class TGeneralized(Type):
         self.gen_id = gen_id
 
     def free_type_variable(self):
-        pass
-
-    def __str__(self):
-        pass
+        return set()
 
     def apply(self, sub):
-        pass
+        return self
 
     def __kind__(self):
-        pass
+        raise Exception("Kind in Type Generalized")
