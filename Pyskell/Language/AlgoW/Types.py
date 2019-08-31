@@ -38,6 +38,9 @@ class TypeVariable:
     def __kind__(self):
         return self.kind
 
+    def __hash__(self):
+        return hash((self.name, self.kind))
+
 
 class TypeConstructor:
     def __init__(self, name, kind):
@@ -72,6 +75,11 @@ class TVariable(Type):
     def __kind__(self):
         return _kind(self.tpv)
 
+    def __eq__(self, other):
+        if not isinstance(other, TVariable):
+            return False
+        return self.tpv == other.tpv
+
 
 class TConstructor(Type):
     def __init__(self, tco):
@@ -88,6 +96,14 @@ class TConstructor(Type):
 
     def __kind__(self):
         return _kind(self.tco)
+
+    def __eq__(self, other):
+        if not isinstance(other, TConstructor):
+            return False
+        return self.tco == other.tco
+
+    def __or__(self, other):
+        pass
 
 
 class TApplication(Type):
@@ -110,6 +126,11 @@ class TApplication(Type):
             raise Exception("t0 has kind {}".format(str(_kind(self.t0))))
         return _kind(self.t0).k1
 
+    def __eq__(self, other):
+        if not isinstance(other, TApplication):
+            return False
+        return (self.t0 == other.t0) and (self.t1 == other.t1)
+
 
 class TGeneralized(Type):
     def __init__(self, gen_id):
@@ -128,15 +149,11 @@ class TGeneralized(Type):
         raise Exception("Kind in Type Generalized")
 
 
-class Infix:
-    def __init__(self, f):
-        self.f = f
-
-    def __or__(self, other):
-        return self.f(other)
-
-    def __ror__(self, other):
-        return Infix(lambda x: self.f(other, x))
-
-    def __call__(self, v1, v2):
-        return self.f(v1, v2)
+def t_app(a, b):
+    if (not isinstance(a, Type)) or (not isinstance(b, Type)):
+        raise Exception("Type Application Error with No Type Arg")
+    if not isinstance(a.__kind__(), KindFunc):
+        raise Exception("Type Application Error with Constructor no arity")
+    if a.__kind__().k0 != b.__kind__():
+        raise Exception("Type Application Error with App Arg Kind Conflict")
+    return TApplication(a, b)
