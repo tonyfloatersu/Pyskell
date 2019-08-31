@@ -1,5 +1,5 @@
 from ..HMTypeSystem import *
-from ..AlgoW import *
+from ..Typing import *
 import types
 
 __python_builtins__ = {

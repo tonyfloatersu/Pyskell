@@ -1,4 +1,4 @@
-from Pyskell.Language.AlgoW.SyntaxExpr import *
+from Pyskell.Language.Typing.SyntaxExpr import *
 import unittest
 
 
