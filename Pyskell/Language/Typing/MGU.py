@@ -33,5 +33,20 @@ class MostGeneralizeUnifier:
         else:
             return Substitution({u: t})
 
+    def match(self, u, t):
+        if (not isinstance(u, Type)) or (not isinstance(t, Type)):
+            raise Exception("Non Type Variable Used In MGU")
+        if isinstance(u, TApplication) and isinstance(t, TApplication):
+            s0 = self.most_generalized_unifier(u.t0, t.t0)
+            s1 = self.most_generalized_unifier(u.t1, t.t1)
+            return s1.merge(s0)
+        elif isinstance(u, TVariable):
+            if u.tpv.__kind__() == t.__kind__():
+                return Substitution({u: t})
+        elif isinstance(u, TConstructor) and isinstance(t, TConstructor):
+            if u.tco == t.tco:
+                return Substitution()
+        raise Exception("Fail to match")
+
 
 glob_mgu = MostGeneralizeUnifier()
