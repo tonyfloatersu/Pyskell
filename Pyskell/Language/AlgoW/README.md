@@ -3,9 +3,4 @@
 > Yet a another small implementation on Algorithm W
 > Hindley Milner Type System
 
-## Kinds
-
-The kinds are shown with 3 forms: `star`, `->`, `constraint`.
-
-# Types
-
+Please check [Typing Haskell in Haskell](https://gist.github.com/chrisdone/0075a16b32bfd4f62b7b).

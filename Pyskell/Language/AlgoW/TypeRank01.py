@@ -1,5 +1,5 @@
 from .Types import *
-from .Kinds import star, k_constraint, KindFunc
+from .Kinds import *
 
 
 class Rank0TypeConstructor(TypeConstructor):
