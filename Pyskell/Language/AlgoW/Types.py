@@ -73,7 +73,7 @@ class TVariable(Type):
         return _kind(self.tpv)
 
 
-class TConstraint(Type):
+class TConstructor(Type):
     def __init__(self, tco):
         if not isinstance(tco, TypeConstructor):
             raise Exception("Error Initialize {}"
@@ -81,10 +81,10 @@ class TConstraint(Type):
         self.tco = tco
 
     def free_type_variable(self):
-        pass
+        return set()
 
     def apply(self, sub):
-        pass
+        return set()
 
     def __kind__(self):
         return _kind(self.tco)
@@ -102,7 +102,8 @@ class TApplication(Type):
         return self.t0.free_type_variable() | self.t1.free_type_variable()
 
     def apply(self, sub):
-        pass
+        return TApplication(self.t0.apply(sub),
+                            self.t1.apply(sub))
 
     def __kind__(self):
         if not isinstance(_kind(self.t0), KindFunc):
@@ -125,3 +126,17 @@ class TGeneralized(Type):
 
     def __kind__(self):
         raise Exception("Kind in Type Generalized")
+
+
+class Infix:
+    def __init__(self, f):
+        self.f = f
+
+    def __or__(self, other):
+        return self.f(other)
+
+    def __ror__(self, other):
+        return Infix(lambda x: self.f(other, x))
+
+    def __call__(self, v1, v2):
+        return self.f(v1, v2)
