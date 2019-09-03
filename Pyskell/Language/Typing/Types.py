@@ -58,6 +58,9 @@ class TypeConstructor:
     def __kind__(self):
         return self.kind
 
+    def __hash__(self):
+        return hash((self.name, self.kind))
+
 
 class TVariable(Type):
     def __init__(self, tpv):
@@ -79,6 +82,9 @@ class TVariable(Type):
         if not isinstance(other, TVariable):
             return False
         return self.tpv == other.tpv
+
+    def __hash__(self):
+        return hash(self.tpv)
 
 
 class TConstructor(Type):
@@ -102,8 +108,8 @@ class TConstructor(Type):
             return False
         return self.tco == other.tco
 
-    def __or__(self, other):
-        pass
+    def __hash__(self):
+        return hash(self.tco)
 
 
 class TApplication(Type):
@@ -130,6 +136,9 @@ class TApplication(Type):
         if not isinstance(other, TApplication):
             return False
         return (self.t0 == other.t0) and (self.t1 == other.t1)
+
+    def __hash__(self):
+        return hash((self.t0, self.t1))
 
 
 class TGeneralized(Type):

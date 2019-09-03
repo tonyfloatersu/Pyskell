@@ -1,5 +1,6 @@
 from .Types import *
 from .Subst import Substitution
+from .Qualified import Predicate
 
 
 class MostGeneralizeUnifier:
@@ -20,6 +21,9 @@ class MostGeneralizeUnifier:
         elif isinstance(t0, TConstructor) and isinstance(t1, TConstructor):
             if t0.tco == t1.tco:
                 return Substitution()
+        elif isinstance(t0, Predicate) and isinstance(t1, Predicate):
+            if t0.class_name == t1.class_name:
+                return self.most_generalized_unifier(t0.Type, t1.Type)
         raise Exception("Fail in Unification")
 
     @staticmethod
@@ -46,6 +50,9 @@ class MostGeneralizeUnifier:
         elif isinstance(u, TConstructor) and isinstance(t, TConstructor):
             if u.tco == t.tco:
                 return Substitution()
+        elif isinstance(u, Predicate) and isinstance(t, Predicate):
+            if u.class_name == t.class_name:
+                return self.most_generalized_unifier(u.Type, t.Type)
         raise Exception("Fail to match")
 
 

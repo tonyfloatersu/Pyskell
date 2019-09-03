@@ -1,4 +1,6 @@
 from .Types import *
+from functools import reduce
+from operator import or_
 
 
 class Predicate(Type):
@@ -14,29 +16,35 @@ class Predicate(Type):
         return self.class_name == other.class_name and self.Type == other.Type
 
     def apply(self, sub):
-        pass
+        return Predicate(self.class_name, self.Type.apply(sub))
 
     def free_type_variable(self):
-        pass
+        return self.Type.free_type_variable()
+
+    def __hash__(self):
+        return hash((self.Type, self.class_name))
 
     def __kind__(self):
         pass
 
 
-class Qualified(Type):
-    def __init__(self):
-        pass
+class Qualified:
+    def __init__(self, predicates, t):
+        if (not isinstance(t, Type)) or \
+                any(map(lambda x: not isinstance(x, Predicate), predicates)):
+            raise Exception("Initialize Qualification Error")
+        self.predicates = predicates
+        self.Type = t
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        pass
+        return set(self.predicates) == set(other.predicates) and \
+            self.Type == other.Type
 
     def apply(self, sub):
-        pass
+        n_predicates = [i.apply(sub) for i in self.predicates]
+        return Qualified(n_predicates, self.Type.apply(sub))
 
     def free_type_variable(self):
-        pass
-
-    def __kind__(self):
-        pass
+        return reduce(or_, self.predicates) | self.Type.free_type_variable()

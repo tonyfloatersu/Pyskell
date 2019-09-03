@@ -15,6 +15,9 @@ class Star(Kind):
     def __str__(self):
         return "*"
 
+    def __hash__(self):
+        return hash(id(self))
+
 
 class KindFunc(Kind):
     def __init__(self, k0, k1):
@@ -31,6 +34,9 @@ class KindFunc(Kind):
             str(self.k1)
         )
 
+    def __hash__(self):
+        return hash((self.k0, self.k1))
+
 
 class KindConstraint(Kind):
     def __init__(self):
@@ -38,6 +44,9 @@ class KindConstraint(Kind):
 
     def __str__(self):
         return "Constraint"
+
+    def __hash__(self):
+        return hash(id(self))
 
 
 star = Star()
