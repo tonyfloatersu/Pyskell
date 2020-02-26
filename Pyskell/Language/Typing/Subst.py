@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .Types import TVariable
 
 
@@ -17,7 +18,7 @@ class Substitution(dict):
             )
         )
 
-    def merge(self, other: 'Substitution'):
+    def merge(self, other: Substitution):
         key_intersect = set(self.keys()).intersection(set(other.keys()))
         if all(map(
                 lambda v: TVariable(v).apply(self) == TVariable(v).apply(other),

@@ -1,4 +1,5 @@
-from .Kinds import Kind, KindFunc
+from __future__ import annotations
+from .Kinds import Kind, KindFunc, star, k_constraint
 from abc import ABCMeta, abstractmethod
 
 
@@ -17,12 +18,15 @@ class Type(metaclass=ABCMeta):
 
 
 def _kind(something):
+    """
+    Immitation of `:k` in Haskell GHCi
+    """
     if not hasattr(something, "__kind__"):
         raise "{} does not have __kind__() attr".format(str(something))
     return something.__kind__()
 
 
-class TypeVariable:
+class TyVar:
     def __init__(self, name, kind):
         if (not isinstance(name, str)) or (not isinstance(kind, Kind)):
             raise Exception("Error Initialize {}"
@@ -35,16 +39,16 @@ class TypeVariable:
             return False
         return (self.name == other.name) and (self.kind == other.kind)
 
-    def __kind__(self):
+    def __kind__(self) -> Kind:
         return self.kind
 
     def __hash__(self):
         return hash((self.name, self.kind))
 
 
-class TypeConstructor:
+class TyCon:
     def __init__(self, name, kind):
-        if not isinstance(kind, Kind):
+        if not isinstance(kind, Kind) or not isinstance(name, str):
             raise Exception("Error Initialize {}"
                             .format(self.__class__.__name__))
         self.name = name
@@ -64,7 +68,7 @@ class TypeConstructor:
 
 class TVariable(Type):
     def __init__(self, tpv):
-        if not isinstance(tpv, TypeVariable):
+        if not isinstance(tpv, TyVar):
             raise Exception("Error Initialize {}"
                             .format(self.__class__.__name__))
         self.tpv = tpv
@@ -89,7 +93,7 @@ class TVariable(Type):
 
 class TConstructor(Type):
     def __init__(self, tco):
-        if not isinstance(tco, TypeConstructor):
+        if not isinstance(tco, TyCon):
             raise Exception("Error Initialize {}"
                             .format(self.__class__.__name__))
         self.tco = tco
@@ -161,8 +165,65 @@ class TGeneralized(Type):
 def t_app(a, b):
     if (not isinstance(a, Type)) or (not isinstance(b, Type)):
         raise Exception("Type Application Error with No Type Arg")
-    if not isinstance(a.__kind__(), KindFunc):
+    if not isinstance(_kind(a), KindFunc):
         raise Exception("Type Application Error with Constructor no arity")
     if a.__kind__().k0 != b.__kind__():
         raise Exception("Type Application Error with App Arg Kind Conflict")
     return TApplication(a, b)
+
+
+# BELOW ARE SOME EXAMPLES, MAYBE THEY WILL BE USED
+
+
+class Rank0TypeConstructor(TyCon):
+    def __init__(self, name):
+        super(Rank0TypeConstructor, self).__init__(name, star)
+
+
+class Rank1TypeConstructor(TyCon):
+    def __init__(self, name, arg_num):
+        new_kind = star
+        for _ in range(0, arg_num):
+            new_kind = KindFunc(star, new_kind)
+        super(Rank1TypeConstructor, self).__init__(name, new_kind)
+
+
+class ListTypeConstructor(Rank1TypeConstructor):
+    def __init__(self):
+        super(ListTypeConstructor, self).__init__(list, 1)
+
+
+def t_list(a):
+    if not isinstance(a, Type):
+        raise Exception("List Type Initialize Error with No Type Arg")
+    return t_app(TConstructor(ListTypeConstructor()), a)
+
+
+class ArrowTypeConstructor(Rank1TypeConstructor):
+    def __init__(self):
+        super(ArrowTypeConstructor, self).__init__("->", 2)
+
+
+def t_arr(a, b):
+    if (not isinstance(a, Type)) or (not isinstance(b, Type)):
+        raise Exception("Arrow Type Initialize Error with No Type Arg")
+    return t_app(t_app(TConstructor(ArrowTypeConstructor()), a), b)
+
+
+class TupleTypeConstructor(Rank1TypeConstructor):
+    def __init__(self, num):
+        if num < 2:
+            raise Exception("Tuple Type Construct smaller than 2")
+        super(TupleTypeConstructor, self).__init__(tuple, num)
+
+
+def t_tuple(*args):
+    t_con = TConstructor(TupleTypeConstructor(len(args)))
+    for arg in args:
+        t_con = t_app(t_con, arg)
+    return t_con
+
+
+"""
+k constraint will be used if type class are applied
+"""
