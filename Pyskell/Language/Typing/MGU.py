@@ -1,15 +1,14 @@
 from .Types import *
+from .Types import _kind
 from .Subst import Substitution
 from .Qualified import Predicate
 
 
-class MostGeneralizeUnifier:
+class __MostGeneralizeUnifier:
     def __init__(self):
         pass
 
-    def most_generalized_unifier(self, t0, t1) -> Substitution:
-        if (not isinstance(t0, Type)) or (not isinstance(t1, Type)):
-            raise Exception("Non Type Variable Used In MGU")
+    def most_generalized_unifier(self, t0: Type, t1: Type) -> Substitution:
         if isinstance(t0, TApplication) and isinstance(t1, TApplication):
             s0 = self.most_generalized_unifier(t0.t0, t1.t0)
             s1 = self.most_generalized_unifier(t0.t1.apply(s0), t1.t1.apply(s0))
@@ -32,14 +31,12 @@ class MostGeneralizeUnifier:
             return Substitution()
         elif u in t.free_type_variable():
             raise Exception("Occur in Type Check Fail")
-        elif u.__kind__() != t.__kind__():
+        elif _kind(u) != _kind(t):
             raise Exception("Kind Check Match Fail")
         else:
             return Substitution({u: t})
 
-    def match(self, u, t):
-        if (not isinstance(u, Type)) or (not isinstance(t, Type)):
-            raise Exception("Non Type Variable Used In MGU")
+    def match(self, u: Type, t: Type) -> Substitution:
         if isinstance(u, TApplication) and isinstance(t, TApplication):
             s0 = self.most_generalized_unifier(u.t0, t.t0)
             s1 = self.most_generalized_unifier(u.t1, t.t1)
@@ -56,4 +53,4 @@ class MostGeneralizeUnifier:
         raise Exception("Fail to match")
 
 
-glob_mgu = MostGeneralizeUnifier()
+glob_mgu = __MostGeneralizeUnifier()

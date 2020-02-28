@@ -27,10 +27,7 @@ def _kind(something):
 
 
 class TyVar:
-    def __init__(self, name, kind):
-        if (not isinstance(name, str)) or (not isinstance(kind, Kind)):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, name: str, kind: Kind):
         self.name = name
         self.kind = kind
 
@@ -47,10 +44,7 @@ class TyVar:
 
 
 class TyCon:
-    def __init__(self, name, kind):
-        if not isinstance(kind, Kind) or not isinstance(name, str):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, name: str, kind: Kind):
         self.name = name
         self.kind = kind
 
@@ -67,10 +61,7 @@ class TyCon:
 
 
 class TVariable(Type):
-    def __init__(self, tpv):
-        if not isinstance(tpv, TyVar):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, tpv: TyVar):
         self.tpv = tpv
 
     def free_type_variable(self):
@@ -92,10 +83,7 @@ class TVariable(Type):
 
 
 class TConstructor(Type):
-    def __init__(self, tco):
-        if not isinstance(tco, TyCon):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, tco: TyCon):
         self.tco = tco
 
     def free_type_variable(self):
@@ -117,10 +105,7 @@ class TConstructor(Type):
 
 
 class TApplication(Type):
-    def __init__(self, t0, t1):
-        if (not isinstance(t0, Type)) or (not isinstance(t1, Type)):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, t0: Type, t1: Type):
         self.t0 = t0
         self.t1 = t1
 
@@ -146,10 +131,7 @@ class TApplication(Type):
 
 
 class TGeneralized(Type):
-    def __init__(self, gen_id):
-        if not isinstance(gen_id, int):
-            raise Exception("Error Initialize {}"
-                            .format(self.__class__.__name__))
+    def __init__(self, gen_id: int):
         self.gen_id = gen_id
 
     def free_type_variable(self):

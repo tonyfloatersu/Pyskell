@@ -10,3 +10,4 @@ Please check [Typing Haskell in Haskell](https://gist.github.com/chrisdone/0075a
 - `Kind` Part is done.
 - `Types` Part is done.
 - `Subst` Part is done.
+- `MGU` Part is done.

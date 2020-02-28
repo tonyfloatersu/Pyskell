@@ -6,7 +6,7 @@ class Substitution(dict):
     """
     Dict Mapping from TypeVariable -> Type
     """
-    def compose(self, oth: 'Substitution'):
+    def compose(self, oth: Substitution):
         return Substitution(
             {k: v.apply(self) for k, v in oth.items()}.items() | self.items()
         )
