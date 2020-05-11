@@ -1,12 +1,12 @@
+from __future__ import annotations
+from typing import List
 from .Types import *
 from functools import reduce
 from operator import or_
 
 
 class Predicate(Type):
-    def __init__(self, class_name, t):
-        if not isinstance(t, Type):
-            raise Exception("Initialize Predicate Error")
+    def __init__(self, class_name: str, t: Type):
         self.Type = t
         self.class_name = class_name
 
@@ -29,10 +29,7 @@ class Predicate(Type):
 
 
 class Qualified:
-    def __init__(self, predicates, t):
-        if (not isinstance(t, Type)) or \
-                any(map(lambda x: not isinstance(x, Predicate), predicates)):
-            raise Exception("Initialize Qualification Error")
+    def __init__(self, predicates: List[Predicate], t: Type):
         self.predicates = predicates
         self.Type = t
 

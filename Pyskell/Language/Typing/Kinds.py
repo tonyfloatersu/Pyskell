@@ -20,12 +20,9 @@ class Star(Kind):
 
 
 class KindFunc(Kind):
-    def __init__(self, k0, k1):
-        if isinstance(k0, Kind) and isinstance(k1, Kind):
-            self.k0 = k0
-            self.k1 = k1
-        else:
-            raise Exception("Initialize Kind Function Error")
+    def __init__(self, k0: Kind, k1: Kind):
+        self.k0 = k0
+        self.k1 = k1
 
     def __str__(self):
         return "{} -> {}".format(

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .Types import TVariable
 
 
@@ -5,7 +6,7 @@ class Substitution(dict):
     """
     Dict Mapping from TypeVariable -> Type
     """
-    def compose(self, oth: 'Substitution'):
+    def compose(self, oth: Substitution):
         return Substitution(
             {k: v.apply(self) for k, v in oth.items()}.items() | self.items()
         )
@@ -17,7 +18,7 @@ class Substitution(dict):
             )
         )
 
-    def merge(self, other: 'Substitution'):
+    def merge(self, other: Substitution):
         key_intersect = set(self.keys()).intersection(set(other.keys()))
         if all(map(
                 lambda v: TVariable(v).apply(self) == TVariable(v).apply(other),
