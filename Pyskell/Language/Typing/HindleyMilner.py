@@ -85,6 +85,8 @@ class TVariable(object):
         return "TypeVariable({})".format(self.name_ord)
 
 
+## Probably need type construction be curry, and allow for kind analysis
+
 class TConstructor(Type):
     def __init__(self, tco: TyCon):
         self.tco = tco
