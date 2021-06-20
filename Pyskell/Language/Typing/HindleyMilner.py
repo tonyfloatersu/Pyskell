@@ -9,7 +9,8 @@ class HType(ABC):
     def __name__(self) -> str: ...
 
     @abstractmethod
-    def __repr__(self) -> str: ...
+    def __repr__(self) -> str:
+        return self.__name__
 
 
 def show_type(something):
@@ -48,9 +49,6 @@ class TOperator(HType):
         return "({0} {1})".format(show_type(self.name),
                                   ' '.join(*map(show_type, self.types)))
 
-    def __repr__(self) -> str:
-        return self.__name__
-
 
 class TFunction(TOperator):
     def __init__(self, from_T: HType, to_T: HType) -> None:
@@ -62,9 +60,6 @@ class TFunction(TOperator):
                                       show_type(self.types[0]),
                                       show_type(self.types[1]))
 
-    def __repr__(self) -> str:
-        return self.__name__
-
 
 class TList(TOperator):
     def __init__(self, in_T: HType):
@@ -74,9 +69,6 @@ class TList(TOperator):
     def __name__(self) -> str:
         return "[{}]".format(show_type(self.types[0]))
 
-    def __repr__(self) -> str:
-        return self.__name__
-
 
 class TTuple(TOperator):
     def __init__(self, in_Ts: List[HType]):
@@ -85,6 +77,3 @@ class TTuple(TOperator):
     @property
     def __name__(self) -> str:
         return "({})".format(", ".join(*map(show_type, self.types)))
-
-    def __repr__(self) -> str:
-        return self.__name__
