@@ -23,15 +23,13 @@ class TVariable(HType):
     def __init__(self, constraints=None):
         self.name_ord = TVariable.var_id
         TVariable.var_id += 1
-        self.constraints = {} if constraints is None else constraints
+        self.constraints = set() if constraints is None else constraints
         self.instance = None
 
     @property
-    def __name__(self) -> str:
-        return 'a' + str(TVariable.var_id)
+    def __name__(self) -> str: return 'a' + str(TVariable.var_id)
 
-    def __repr__(self) -> str:
-        return "TypeVariable({})".format(self.name_ord)
+    def __repr__(self) -> str: return "TypeVariable({})".format(self.name_ord)
 
 
 class TOperator(HType):
@@ -48,7 +46,7 @@ class TOperator(HType):
 
 
 class TFunction(TOperator):
-    def __init__(self, from_t: HType, to_t: HType) -> None:
+    def __init__(self, from_t: HType, to_t: HType):
         super().__init__("->", [from_t, to_t])
 
     @property
@@ -59,8 +57,7 @@ class TFunction(TOperator):
 
 
 class TList(TOperator):
-    def __init__(self, in_t: HType):
-        super().__init__("[]", [in_t])
+    def __init__(self, in_t: HType): super().__init__("[]", [in_t])
 
     @property
     def __name__(self) -> str:
@@ -68,9 +65,30 @@ class TList(TOperator):
 
 
 class TTuple(TOperator):
-    def __init__(self, in_ts: List[HType]):
-        super().__init__("()", in_ts)
+    def __init__(self, in_ts: List[HType]): super().__init__("()", in_ts)
 
     @property
     def __name__(self) -> str:
         return "({})".format(", ".join(*map(show_type, self.types)))
+
+
+class HAST(ABC):
+    @abstractmethod
+    def __str__(self) -> str: ...
+
+
+class HLambda(HAST):
+    def __init__(self, v: HAST, defs: HAST):
+        self.v = v
+        self.defs = defs
+
+    def __str__(self) -> str: return "(\\{0} -> {1})".format(self.v, self.defs)
+
+
+class HApplication(HAST):
+    def __init__(self):
+        pass
+
+
+class HVariable(HAST):
+    pass
