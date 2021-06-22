@@ -97,3 +97,18 @@ class HApplication(HAST):
         self.arg = arg
 
     def __repr__(self) -> str: return "({0} {1})".format(self.func, self.arg)
+
+
+class HLet(HAST):
+    def __init__(self, var: HAST, defs: HAST, expr: HAST):
+        self.var = var
+        self.defs = defs
+        self.expr = expr
+
+    def __repr__(self) -> str:
+        return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
+
+
+class MostGeneralUnifier:
+    def __init__(self) -> None:
+        pass
