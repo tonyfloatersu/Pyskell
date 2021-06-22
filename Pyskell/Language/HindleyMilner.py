@@ -27,7 +27,7 @@ class TVariable(HType):
         self.instance = None
 
     @property
-    def __name__(self) -> str: return 'a' + str(TVariable.var_id)
+    def __name__(self) -> str: return 'a' + str(self.name_ord)
 
     def __repr__(self) -> str: return "TypeVariable({})".format(self.name_ord)
 
@@ -72,9 +72,15 @@ class TTuple(TOperator):
         return "({})".format(", ".join(*map(show_type, self.types)))
 
 
-class HAST(ABC):
-    @abstractmethod
-    def __str__(self) -> str: ...
+class HAST(object):
+    def __repr__(self) -> str: ...
+
+
+class HVariable(HAST):
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self) -> str: return str(self.name)
 
 
 class HLambda(HAST):
@@ -82,13 +88,12 @@ class HLambda(HAST):
         self.v = v
         self.defs = defs
 
-    def __str__(self) -> str: return "(\\{0} -> {1})".format(self.v, self.defs)
+    def __repr__(self) -> str: return "(\\{0} -> {1})".format(self.v, self.defs)
 
 
 class HApplication(HAST):
-    def __init__(self):
-        pass
+    def __init__(self, func: HAST, arg: HAST):
+        self.func = func
+        self.arg = arg
 
-
-class HVariable(HAST):
-    pass
+    def __repr__(self) -> str: return "({0} {1})".format(self.func, self.arg)
