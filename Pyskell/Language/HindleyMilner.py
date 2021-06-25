@@ -1,9 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Dict, List
 
 
-class HType(ABC):
+class HType(ABC, type):
     @property
     @abstractmethod
     def __name__(self) -> str: ...
@@ -109,6 +109,9 @@ class HLet(HAST):
         return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
 
 
-class MostGeneralUnifier:
-    def __init__(self) -> None:
-        pass
+class GammaEnv(dict):
+    pass
+
+
+def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType]) -> None:
+    pass
