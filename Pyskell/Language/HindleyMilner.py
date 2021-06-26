@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List
 
 
-class HType(ABC, type):
+class HType(ABC):
     @property
     @abstractmethod
     def __name__(self) -> str: ...
@@ -113,5 +113,13 @@ class GammaEnv(dict):
     pass
 
 
-def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType]) -> None:
-    pass
+def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType]) -> HType:
+    if isinstance(expr, HVariable):
+        pass
+    elif isinstance(expr, HApplication):
+        pass
+    elif isinstance(expr, HLambda):
+        pass
+    elif isinstance(expr, HLet):
+        pass
+    raise Exception("Fail to infer the type of expression {}".format(expr))
