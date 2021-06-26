@@ -114,23 +114,19 @@ def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
 
     non_generic = set() if non_generic is None else non_generic
 
-    def fun_var(_expr: HAST, _gamma_env: Dict[HAST, HType],
-                _non_generic: Set[TVariable]) -> HType:
+    def fun_var(_expr: HAST) -> HType:
         # TODO assert expr is HVariable
         return TVariable()
 
-    def fun_app(_expr: HAST, _gamma_env: Dict[HAST, HType],
-                _non_generic: Set[TVariable]) -> HType:
+    def fun_app(_expr: HAST) -> HType:
         # TODO assert expr is HApplication
         return TVariable()
 
-    def fun_lam(_expr: HAST, _gamma_env: Dict[HAST, HType],
-                _non_generic: Set[TVariable]) -> HType:
+    def fun_lam(_expr: HAST) -> HType:
         # TODO assert expr is HLambda
         return TVariable()
 
-    def fun_let(_expr: HAST, _gamma_env: Dict[HAST, HType],
-                _non_generic: Set[TVariable]) -> HType:
+    def fun_let(_expr: HAST) -> HType:
         # TODO assert expr is HLet
         return TVariable()
 
@@ -141,4 +137,4 @@ def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
         HLet.__name__: fun_let
     }
 
-    return switch_case[type(expr).__name__](expr, gamma_env, non_generic)
+    return switch_case[type(expr).__name__](expr)
