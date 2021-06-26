@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Set
 
 
 class HType(ABC):
@@ -109,17 +109,36 @@ class HLet(HAST):
         return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
 
 
-class GammaEnv(dict):
-    pass
+def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
+                non_generic: Set[TVariable] = None) -> HType:
 
+    non_generic = set() if non_generic is None else non_generic
 
-def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType]) -> HType:
-    if isinstance(expr, HVariable):
-        pass
-    elif isinstance(expr, HApplication):
-        pass
-    elif isinstance(expr, HLambda):
-        pass
-    elif isinstance(expr, HLet):
-        pass
-    raise Exception("Fail to infer the type of expression {}".format(expr))
+    def fun_var(_expr: HAST, _gamma_env: Dict[HAST, HType],
+                _non_generic: Set[TVariable]) -> HType:
+        # TODO assert expr is HVariable
+        return TVariable()
+
+    def fun_app(_expr: HAST, _gamma_env: Dict[HAST, HType],
+                _non_generic: Set[TVariable]) -> HType:
+        # TODO assert expr is HApplication
+        return TVariable()
+
+    def fun_lam(_expr: HAST, _gamma_env: Dict[HAST, HType],
+                _non_generic: Set[TVariable]) -> HType:
+        # TODO assert expr is HLambda
+        return TVariable()
+
+    def fun_let(_expr: HAST, _gamma_env: Dict[HAST, HType],
+                _non_generic: Set[TVariable]) -> HType:
+        # TODO assert expr is HLet
+        return TVariable()
+
+    switch_case = {
+        HVariable.__name__: fun_var,
+        HApplication.__name__: fun_app,
+        HLambda.__name__: fun_lam,
+        HLet.__name__: fun_let
+    }
+
+    return switch_case[type(expr).__name__](expr, gamma_env, non_generic)
