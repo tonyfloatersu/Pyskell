@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Dict, List, Set
+from dataclasses import dataclass, field
 
 
 class HType(ABC):
@@ -109,24 +110,36 @@ class HLet(HAST):
         return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
 
 
-def mgu_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
+def prune(t: HType):
+    if isinstance(t, TVariable) and t.instance is not None:
+        t.instance = prune(t.instance)
+        return t.instance
+    return t
+
+
+@dataclass
+class TypeEnv:
+    id_type_map : Dict[int, HType] = field(default_factory=dict)
+
+
+def mgu_analyze(expr: HAST, gamma_env: TypeEnv,
                 non_generic: Set[TVariable] = None) -> HType:
 
     non_generic = set() if non_generic is None else non_generic
 
-    def fun_var(_expr: HAST) -> HType:
+    def fun_var(_expr: HVariable) -> HType:
         # TODO assert expr is HVariable
         return TVariable()
 
-    def fun_app(_expr: HAST) -> HType:
+    def fun_app(_expr: HApplication) -> HType:
         # TODO assert expr is HApplication
         return TVariable()
 
-    def fun_lam(_expr: HAST) -> HType:
+    def fun_lam(_expr: HLambda) -> HType:
         # TODO assert expr is HLambda
         return TVariable()
 
-    def fun_let(_expr: HAST) -> HType:
+    def fun_let(_expr: HLet) -> HType:
         # TODO assert expr is HLet
         return TVariable()
 
