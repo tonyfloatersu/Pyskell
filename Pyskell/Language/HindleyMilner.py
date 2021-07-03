@@ -22,15 +22,23 @@ class TVariable(HType):
     var_id = 0
 
     def __init__(self, constraints=None):
-        self.name_ord = TVariable.var_id
-        TVariable.var_id += 1
+        self.name_ord = None
         self.constraints = set() if constraints is None else constraints
         self.instance = None
 
-    @property
-    def __name__(self) -> str: return 'a' + str(self.name_ord)
+    def __lazy_assign(self) -> None:
+        if self.name_ord is None:
+            self.name_ord = TVariable.var_id
+            TVariable.var_id += 1
 
-    def __repr__(self) -> str: return "TypeVariable({})".format(self.name_ord)
+    @property
+    def __name__(self) -> str:
+        self.__lazy_assign()
+        return 'a' + str(self.name_ord)
+
+    def __repr__(self) -> str:
+        self.__lazy_assign()
+        return "TypeVariable({})".format(self.name_ord)
 
 
 class TOperator(HType):
@@ -112,7 +120,8 @@ class HLet(HAST):
 
 def prune(t: HType):
     if isinstance(t, TVariable) and t.instance is not None:
-        t.instance = prune(t.instance)
+        temp = prune(t.instance)
+        t.instance = temp
         return t.instance
     return t
 
@@ -122,25 +131,25 @@ class TypeEnv:
     id_type_map : Dict[int, HType] = field(default_factory=dict)
 
 
-def mgu_analyze(expr: HAST, gamma_env: TypeEnv,
-                non_generic: Set[TVariable] = None) -> HType:
+def expr_type_analyze(expr: HAST, gamma_env: TypeEnv,
+                      non_generic: Set[TVariable] = None) -> HType:
 
     non_generic = set() if non_generic is None else non_generic
 
-    def fun_var(_expr: HVariable) -> HType:
-        # TODO assert expr is HVariable
+    def fun_var(_expr: HAST) -> HType:
+        assert isinstance(_expr, HVariable)
         return TVariable()
 
-    def fun_app(_expr: HApplication) -> HType:
-        # TODO assert expr is HApplication
+    def fun_app(_expr: HAST) -> HType:
+        assert isinstance(_expr, HApplication)
         return TVariable()
 
-    def fun_lam(_expr: HLambda) -> HType:
-        # TODO assert expr is HLambda
+    def fun_lam(_expr: HAST) -> HType:
+        assert isinstance(_expr, HLambda)
         return TVariable()
 
-    def fun_let(_expr: HLet) -> HType:
-        # TODO assert expr is HLet
+    def fun_let(_expr: HAST) -> HType:
+        assert isinstance(_expr, HLet)
         return TVariable()
 
     switch_case = {
