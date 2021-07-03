@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
+from functools import lru_cache
 
 
 class HType(ABC):
@@ -23,7 +24,7 @@ class TVariable(HType):
     def __init__(self, constraints=None):
         self.name_ord = None
         self.constraints = set() if constraints is None else constraints
-        self.instance = None
+        self.instance: Optional[HType] = None
 
     def __lazy_assign(self) -> None:
         if self.name_ord is None:
@@ -117,12 +118,21 @@ class HLet(HAST):
         return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
 
 
-def prune(t: HType):
+@lru_cache
+def prune(t: HType) -> HType:
     if isinstance(t, TVariable) and t.instance is not None:
-        temp = prune(t.instance)
-        t.instance = temp
+        t.instance = prune(t.instance)
         return t.instance
     return t
+
+
+def occurs_in(pruned_t: HType, t2: HType) -> bool:
+    pruned_t2 = prune(t2)
+    if pruned_t2 == pruned_t:
+        return True
+    elif isinstance(pruned_t2, TOperator):
+        return any(occurs_in(pruned_t, t) for t in pruned_t2.types)
+    return False
 
 
 def fresh(t: HType, non_generic: Set[TVariable]) -> HType:
@@ -131,7 +141,7 @@ def fresh(t: HType, non_generic: Set[TVariable]) -> HType:
     def fresh_rec(_t: HType) -> HType:
         tp = prune(_t)
         if isinstance(tp, TVariable):
-            if tp not in non_generic:
+            if not any(occurs_in(tp, non_gt) for non_gt in non_generic):
                 if tp not in memorization:
                     memorization[tp] = TVariable()
                 return memorization[tp]
