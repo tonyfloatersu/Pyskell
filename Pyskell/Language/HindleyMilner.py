@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Set
-from functools import lru_cache
 
 
 class HType(ABC):
@@ -118,7 +117,6 @@ class HLet(HAST):
         return "(let {0} = {1} in {2})".format(self.var, self.defs, self.expr)
 
 
-@lru_cache
 def prune(t: HType) -> HType:
     if isinstance(t, TVariable) and t.instance is not None:
         t.instance = prune(t.instance)
@@ -165,9 +163,35 @@ def type_from_env(name: HAST, gamma_env: Dict[HAST, HType],
     return fresh(gamma_env[name], non_generic)
 
 
+def unify_type_variable(ptv1: TVariable, pt2: HType) -> None:
+    if ptv1 == pt2:
+        return
+
+    if occurs_in(ptv1, pt2):
+        raise TypeError("Recursive Unification")
+    if isinstance(pt2, TVariable):
+        ptv1.constraints |= pt2.constraints
+        pt2.constraints |= ptv1.constraints
+    ptv1.instance = pt2
+
+
+def unify(t1: HType, t2: HType) -> None:
+    pt1, pt2 = prune(t1), prune(t2)
+    if isinstance(pt1, TVariable):
+        unify_type_variable(pt1, pt2)
+    elif isinstance(pt2, TVariable) and isinstance(pt1, TOperator):
+        unify_type_variable(pt2, pt1)
+    else:
+        assert isinstance(pt1, TOperator) and isinstance(pt2, TOperator)
+        # TODO poly higher-kind type
+        if len(pt1.types) != len(pt2.types) or pt1.name != pt2.name:
+            raise TypeError("Unable to match type {} and {}".format(pt1, pt2))
+        for pt1t, pt2t in zip(pt1.types, pt2.types):
+            unify(pt1t, pt2t)
+
+
 def expr_type_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
                       non_generic: Set[TVariable] = None) -> HType:
-
     non_generic = set() if non_generic is None else non_generic
 
     def fun_var(_expr: HAST) -> HType:
