@@ -192,7 +192,17 @@ def unify(t1: HType, t2: HType) -> None:
 
 def expr_type_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
                       non_generic: Set[TVariable] = None) -> HType:
+
     non_generic = set() if non_generic is None else non_generic
+
+    def rep_env_non_gen(_gamma_env: Dict[HAST, HType],
+                        _non_generic: Set[TVariable],
+                        _expr: HAST, _expr_tv: TVariable):
+        new_non_generic = _non_generic.copy()
+        new_gamma_env = _gamma_env.copy()
+        new_non_generic.add(_expr_tv)
+        new_gamma_env[_expr] = _expr_tv
+        return new_non_generic, new_gamma_env
 
     def fun_var(_expr: HAST) -> HType:
         assert isinstance(_expr, HVariable)
@@ -202,23 +212,26 @@ def expr_type_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
         assert isinstance(_expr, HApplication)
         fun_type = type_from_env(_expr.func, gamma_env, non_generic)
         arg_type = type_from_env(_expr.arg, gamma_env, non_generic)
-        # TODO unify
-        return TVariable()
+        result_t = TVariable()
+        unify(TFunction(arg_type, result_t), fun_type)
+        return result_t
 
     def fun_lam(_expr: HAST) -> HType:
         assert isinstance(_expr, HLambda)
         arg_type = TVariable()
-        new_non_generic = non_generic.copy()
-        new_non_generic.add(arg_type)
-        new_gamma_env = gamma_env.copy()
-        new_gamma_env[_expr.v] = arg_type
+        new_non_generic, new_gamma_env = \
+            rep_env_non_gen(gamma_env, non_generic, _expr.v, arg_type)
         body_type = expr_type_analyze(_expr.defs, new_gamma_env, non_generic)
         return TFunction(arg_type, body_type)
 
     def fun_let(_expr: HAST) -> HType:
         assert isinstance(_expr, HLet)
-        # TODO
-        return TVariable()
+        arg_type = TVariable()
+        new_non_generic, new_gamma_env = \
+            rep_env_non_gen(gamma_env, non_generic, _expr.var, arg_type)
+        defs_t = expr_type_analyze(_expr.defs, new_gamma_env, new_non_generic)
+        unify(arg_type, defs_t)
+        return expr_type_analyze(_expr.expr, new_gamma_env, non_generic)
 
     switch_case = {
         HVariable.__name__: fun_var,
