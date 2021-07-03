@@ -219,19 +219,19 @@ def expr_type_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
     def fun_lam(_expr: HAST) -> HType:
         assert isinstance(_expr, HLambda)
         arg_type = TVariable()
-        new_non_generic, new_gamma_env = \
+        new_non_generic, new_env = \
             rep_env_non_gen(gamma_env, non_generic, _expr.v, arg_type)
-        body_type = expr_type_analyze(_expr.defs, new_gamma_env, non_generic)
+        body_type = expr_type_analyze(_expr.defs, new_env, new_non_generic)
         return TFunction(arg_type, body_type)
 
     def fun_let(_expr: HAST) -> HType:
         assert isinstance(_expr, HLet)
         arg_type = TVariable()
-        new_non_generic, new_gamma_env = \
+        new_non_generic, new_env = \
             rep_env_non_gen(gamma_env, non_generic, _expr.var, arg_type)
-        defs_t = expr_type_analyze(_expr.defs, new_gamma_env, new_non_generic)
+        defs_t = expr_type_analyze(_expr.defs, new_env, new_non_generic)
         unify(arg_type, defs_t)
-        return expr_type_analyze(_expr.expr, new_gamma_env, non_generic)
+        return expr_type_analyze(_expr.expr, new_env, non_generic)
 
     switch_case = {
         HVariable.__name__: fun_var,
