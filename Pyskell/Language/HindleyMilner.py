@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Dict, List, Set
-from dataclasses import dataclass, field
 
 
 class HType(ABC):
@@ -126,30 +125,65 @@ def prune(t: HType):
     return t
 
 
-@dataclass
-class TypeEnv:
-    id_type_map : Dict[int, HType] = field(default_factory=dict)
+def fresh(t: HType, non_generic: Set[TVariable]) -> HType:
+    memorization: Dict[TVariable, TVariable] = dict()
+
+    def fresh_rec(_t: HType) -> HType:
+        tp = prune(_t)
+        if isinstance(tp, TVariable):
+            if tp not in non_generic:
+                if tp not in memorization:
+                    memorization[tp] = TVariable()
+                return memorization[tp]
+            return tp
+        elif isinstance(tp, TFunction):
+            return TFunction(fresh_rec(tp.types[0]), fresh_rec(tp.types[1]))
+        elif isinstance(tp, TList):
+            return TList(fresh_rec(tp.types[0]))
+        elif isinstance(tp, TTuple):
+            return TTuple([fresh_rec(i) for i in tp.types])
+        elif isinstance(tp, TOperator):
+            return TOperator(tp.name, [fresh_rec(i) for i in tp.types])
+        return tp
+
+    return fresh_rec(t)
 
 
-def expr_type_analyze(expr: HAST, gamma_env: TypeEnv,
+def type_from_env(name: HAST, gamma_env: Dict[HAST, HType],
+                  non_generic: Set[TVariable]) -> HType:
+    assert name in gamma_env
+    return fresh(gamma_env[name], non_generic)
+
+
+def expr_type_analyze(expr: HAST, gamma_env: Dict[HAST, HType],
                       non_generic: Set[TVariable] = None) -> HType:
 
     non_generic = set() if non_generic is None else non_generic
 
     def fun_var(_expr: HAST) -> HType:
         assert isinstance(_expr, HVariable)
-        return TVariable()
+        return type_from_env(_expr.name, gamma_env, non_generic)
 
     def fun_app(_expr: HAST) -> HType:
         assert isinstance(_expr, HApplication)
+        fun_type = type_from_env(_expr.func, gamma_env, non_generic)
+        arg_type = type_from_env(_expr.arg, gamma_env, non_generic)
+        # TODO unify
         return TVariable()
 
     def fun_lam(_expr: HAST) -> HType:
         assert isinstance(_expr, HLambda)
-        return TVariable()
+        arg_type = TVariable()
+        new_non_generic = non_generic.copy()
+        new_non_generic.add(arg_type)
+        new_gamma_env = gamma_env.copy()
+        new_gamma_env[_expr.v] = arg_type
+        body_type = expr_type_analyze(_expr.defs, new_gamma_env, non_generic)
+        return TFunction(arg_type, body_type)
 
     def fun_let(_expr: HAST) -> HType:
         assert isinstance(_expr, HLet)
+        # TODO
         return TVariable()
 
     switch_case = {
