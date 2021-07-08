@@ -73,38 +73,33 @@ class HMTypeSystemTest(unittest.TestCase):
         self.inference_fail(HApplication(HVariable("times"), HVariable("unknown_var")))
         # mono restriction
         self.inference_fail(
-            HLambda("x",
+            HLambda(HVariable("x"),
                     HApplication(
-                       HApplication(HVariable("pair"),
-                               HApplication(HVariable("x"), HVariable("True"))),
-                       HApplication(HVariable("x"), HVariable("4"))
-                   )
-                   )
+                        HApplication(HVariable("pair"),
+                                     HApplication(HVariable("x"), HVariable(True))),
+                        HApplication(HVariable("x"), HVariable(4))))
         )
-        self.inference_success(HLambda("x",
-                               HApplication(HApplication(HVariable("pair"),
-                                               HApplication(HVariable("x"),
-                                                       HVariable("1"))),
-                                       HApplication(HVariable("x"), HVariable("123"))))
-                               )
+        self.inference_success(
+            HLambda(HVariable("x"),
+                    HApplication(HApplication(HVariable("pair"),
+                                              HApplication(HVariable("x"),
+                                                           HVariable(1))),
+                                 HApplication(HVariable("x"), HVariable(123))))
+        )
         # recursive type restriction
         self.inference_fail(
-            HLambda("x",
-                   HApplication(HVariable("x"),
-                           HVariable("x"))
-                   )
+            HLambda(HVariable("x"),
+                    HApplication(HVariable("x"), HVariable("x")))
         )
 
     def test_hm_sys_type_check(self):
-        self.expression_type_check_success(HVariable("123"), self.Integer)
-        self.expression_type_check_success(HVariable("True"), self.Bool)
-        self.expression_type_check_fail(HVariable("True"), self.Integer)
-        self.expression_type_check_fail(HVariable("123"), self.NoneT)
-        self.expression_type_check_success(HApplication(HVariable("id"),
-                                                   HVariable("123")),
+        self.expression_type_check_success(HVariable(123), self.Integer)
+        self.expression_type_check_success(HVariable(True), self.Bool)
+        self.expression_type_check_fail(HVariable(True), self.Integer)
+        self.expression_type_check_fail(HVariable(123), self.NoneT)
+        self.expression_type_check_success(HApplication(HVariable("id"), HVariable(123)),
                                            self.Integer)
-        self.expression_type_check_fail(HApplication(HVariable("id"),
-                                                HVariable("123")),
+        self.expression_type_check_fail(HApplication(HVariable("id"), HVariable(123)),
                                         self.Bool)
         self.expression_type_check_success(HLambda(HVariable("x"), HVariable("x")),
                                            self.env[HVariable("id")])
@@ -114,24 +109,19 @@ class HMTypeSystemTest(unittest.TestCase):
                                            TFunction(self.Integer, self.Integer))
         self.expression_type_check_success(HVariable("pred"),
                                            TFunction(TVariable(), TVariable()))
-        self.expression_type_check_success(HApplication(HVariable("pred"),
-                                                   HVariable("123")),
+        self.expression_type_check_success(HApplication(HVariable("pred"), HVariable(123)),
                                            self.Integer)
         self.expression_type_check_success(self.compose,
                                            TFunction(TFunction(self.var1, self.var2),
-                                                 TFunction(TFunction(self.var2,
-                                                             self.var3),
-                                                       TFunction(self.var1,
-                                                             self.var3))))
+                                                     TFunction(TFunction(self.var2, self.var3),
+                                                       TFunction(self.var1, self.var3))))
         self.expression_type_check_success(HVariable("times"),
                                            TFunction(self.Integer,
-                                                 TFunction(self.Integer,
-                                                       self.Integer)))
+                                                     TFunction(self.Integer, self.Integer)))
         self.expression_type_check_success(HApplication(HVariable("times"),
                                                    HVariable("123")),
                                            TFunction(self.Integer, self.Integer))
-        self.expression_type_check_fail(HApplication(HVariable("times"),
-                                                HVariable("4")),
+        self.expression_type_check_fail(HApplication(HVariable("times"), HVariable(4)),
                                         TFunction(self.Integer, self.NoneT))
         self.expression_type_check_success(HLambda(HVariable("x"), HVariable("x")),
                                            TFunction(self.var1, self.var1))
@@ -140,14 +130,12 @@ class HMTypeSystemTest(unittest.TestCase):
         self.type_unify_success(
             expr_type_analyze(
                 HLambda(HVariable("x"),
-                        HApplication(HApplication(HVariable("pair"),
-                                                  HVariable("x")),
+                        HApplication(HApplication(HVariable("pair"), HVariable("x")),
                                      HVariable("x"))),
                 self.env, None),
             TFunction(TVariable(), self.Pair))
         temp = TVariable()
-        self.expression_type_check_success(HApplication(self.compose,
-                                                   HVariable("zero")),
+        self.expression_type_check_success(HApplication(self.compose, HVariable("zero")),
                                            TFunction(TFunction(self.Bool, temp),
                                                  TFunction(self.Integer, temp)))
         self.expression_type_check_success(HLet("a", HVariable("times"),
