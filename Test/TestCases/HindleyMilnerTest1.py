@@ -119,7 +119,7 @@ class HMTypeSystemTest(unittest.TestCase):
                                            TFunction(self.Integer,
                                                      TFunction(self.Integer, self.Integer)))
         self.expression_type_check_success(HApplication(HVariable("times"),
-                                                   HVariable("123")),
+                                                   HVariable(123)),
                                            TFunction(self.Integer, self.Integer))
         self.expression_type_check_fail(HApplication(HVariable("times"), HVariable(4)),
                                         TFunction(self.Integer, self.NoneT))
@@ -140,8 +140,8 @@ class HMTypeSystemTest(unittest.TestCase):
                                                  TFunction(self.Integer, temp)))
         self.expression_type_check_success(HLet("a", HVariable("times"),
                                                HApplication(HApplication(HVariable("a"),
-                                                               HVariable("1")),
-                                                       HVariable("4"))),
+                                                               HVariable(1)),
+                                                       HVariable(4))),
                                            self.Integer)
         self.expression_type_check_success(HApplication(HVariable("id"),
                                                    HVariable("id")),
@@ -157,32 +157,32 @@ class HMTypeSystemTest(unittest.TestCase):
                                                        TFunction(t_tp_1, t_tp_3))))
 
         self.expression_type_check_success(HApplication(HApplication(HVariable("pair"),
-                                                           HVariable("1")),
+                                                           HVariable(1)),
                                                    HVariable("True")),
                                            TOperator("*", [self.Integer,
                                                               self.Bool]))
         self.expression_type_check_success(HApplication(HApplication(HVariable("pair"),
-                                                           HVariable("1")),
+                                                           HVariable(1)),
                                                    HVariable("True")),
                                            TOperator("*", [t_tp_1,
                                                               t_tp_2]))
         self.expression_type_check_fail(HApplication(HApplication(HVariable("times"),
-                                                        HVariable("1")),
-                                                HVariable("2")),
+                                                        HVariable(1)),
+                                                HVariable(2)),
                                         self.Bool)
-        self.expression_type_check_success(HLet("g", HLambda("f", HVariable("4")),
+        self.expression_type_check_success(HLet(HVariable("g"), HLambda("f", HVariable(4)),
                                                HApplication(HVariable("g"),
                                                        HVariable("g"))),
                                            self.Integer)
         self.expression_type_check_success(HApplication(HApplication(self.compose,
                                                            HVariable("id")),
                                                    HApplication(HVariable("times"),
-                                                           HVariable("1"))),
+                                                           HVariable(1))),
                                            TFunction(self.Integer, self.Integer))
         self.expression_type_check_success(HApplication(HApplication(
             self.compose,
             HApplication(HVariable("times"),
-                    HVariable("1"))),
+                    HVariable(1))),
             HVariable("id")),
             TFunction(self.Integer, self.Integer))
         self.expression_type_check_success(
@@ -191,7 +191,7 @@ class HMTypeSystemTest(unittest.TestCase):
                                   HApplication(HApplication(HVariable("times"),
                                                   HVariable("x")),
                                           HVariable("y")))),
-                    HVariable("1")),
+                    HVariable(1)),
             TFunction(self.Integer, self.Integer))
         self.expression_type_check_success(
             HApplication(HLambda("y",
@@ -199,7 +199,7 @@ class HMTypeSystemTest(unittest.TestCase):
                                   HApplication(HApplication(HVariable("times"),
                                                   HVariable("x")),
                                           HVariable("y")))),
-                    HVariable("1")),
+                    HVariable(1)),
             TFunction(self.Integer, self.Integer))
         self.expression_type_check_success(
             HApplication(HApplication(HLambda("x",
@@ -209,12 +209,12 @@ class HMTypeSystemTest(unittest.TestCase):
             self.NoneT
         )
         self.expression_type_check_success(
-            HLet("a", HVariable("1"),
+            HLet("a", HVariable(1),
                 HLet("a", HVariable("None"), HVariable("a"))),
             self.NoneT
         )
         self.expression_type_check_fail(
-            HLet("a", HVariable("1"),
+            HLet("a", HVariable(1),
                 HLet("a", HVariable("None"), HVariable("b"))),
             self.NoneT
         )
@@ -224,14 +224,14 @@ class HMTypeSystemTest(unittest.TestCase):
                        HApplication(HApplication(HApplication(HVariable("cond"),
                                                HApplication(HVariable("zero"),
                                                        HVariable("n"))),
-                                       HVariable("1")),
+                                       HVariable(1)),
                                HApplication(HApplication(HVariable("times"),
                                                HVariable("n")),
                                        HApplication(HVariable("factorial"),
                                                HApplication(HVariable("pred"),
                                                        HVariable("n")))
                                        ))),
-                HApplication(HVariable("factorial"), HVariable("4"))
+                HApplication(HVariable("factorial"), HVariable(4))
                 ),
             self.Integer
         )
