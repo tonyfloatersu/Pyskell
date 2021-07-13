@@ -19,20 +19,22 @@ class HMTypeSystemTest(unittest.TestCase):
         self.Integer: HType = TOperator(int, [])
         self.NoneT: HType = TOperator(None, [])
 
-        self.env: Dict[HAST, HType] = {HVariable("pair"):  TFunction(self.var1, TFunction(self.var2, self.Pair)),
-                                       HVariable(True):    self.Bool,
-                                       HVariable(None):    self.NoneT,
-                                       HVariable("id"):    TFunction(self.var4, self.var4),
-                                       HVariable("cond"):  TFunction(self.Bool,
-                                                                     TFunction(self.var3,
-                                                                               TFunction(self.var3, self.var3))),
-                                       HVariable("zero"):  TFunction(self.Integer, self.Bool),
-                                       HVariable("pred"):  TFunction(self.Integer, self.Integer),
-                                       HVariable("times"): TFunction(self.Integer,
-                                                                     TFunction(self.Integer, self.Integer)),
-                                       HVariable(4):       self.Integer,
-                                       HVariable(123):     self.Integer,
-                                       HVariable(1):       self.Integer}
+        self.env: Dict[HAST, HType] = {
+            HVariable("pair"):  TFunction(self.var1, TFunction(self.var2, self.Pair)),
+            HVariable(True):    self.Bool,
+            HVariable(None):    self.NoneT,
+            HVariable("id"):    TFunction(self.var4, self.var4),
+            HVariable("cond"):  TFunction(self.Bool,
+                                          TFunction(self.var3,
+                                                    TFunction(self.var3, self.var3))),
+            HVariable("zero"):  TFunction(self.Integer, self.Bool),
+            HVariable("pred"):  TFunction(self.Integer, self.Integer),
+            HVariable("times"): TFunction(self.Integer,
+                                          TFunction(self.Integer, self.Integer)),
+            HVariable(4):       self.Integer,
+            HVariable(123):     self.Integer,
+            HVariable(1):       self.Integer
+        }
 
         self.compose = HLambda(HVariable("f"),
                                HLambda(HVariable("g"),

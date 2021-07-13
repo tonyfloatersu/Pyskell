@@ -159,7 +159,8 @@ def fresh(t: HType, non_generic: Set[TVariable]) -> HType:
 
 def type_from_env(name: HAST, gamma_env: Dict[HAST, HType],
                   non_generic: Set[TVariable]) -> HType:
-    assert name in gamma_env
+    if name not in gamma_env:
+        raise TypeError("{} not in gamma_env".format(name))
     return fresh(gamma_env[name], non_generic)
 
 
