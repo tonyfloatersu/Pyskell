@@ -1,4 +1,4 @@
-from .TestCases.HindleyMilnerTest1 import *
+from TestCases import *
 
 
 if __name__ == '__main__':
